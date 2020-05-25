@@ -29,4 +29,8 @@
         <item name="android:layout_height">35dp</item>
     </style>
 
+    <style name="splashScreen" parent="Theme.AppCompat.Light.NoActionBar">
+
+    </style>
+
 </resources>
