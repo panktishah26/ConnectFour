@@ -1,7 +1,9 @@
 package com.example.connectfour;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,8 +17,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -32,18 +43,43 @@ public class GameActivity extends AppCompatActivity {
     static boolean playerTurn;
 
     private static final String TAG = "GameActivity";
-
-
+    /*anagha db update start*/
+    private FirebaseAuth mAuth;
+    static int lost;
+    static int won;
+    private static String status="";
+    Button btnExit;
+    /*anagha db update end*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        mAuth = FirebaseAuth.getInstance();
+        btnExit=findViewById(R.id.btnExit);
+
+
+        /* code added by anagha starts*/
+        Button btnUserProfile=findViewById(R.id.btnUserProfile);
+        btnUserProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(GameActivity.this, userHomeActivity.class));
+            }
+        });
+        btnExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(GameActivity.this, MainActivity.class));
+            }
+        });
+        /* code added by anagha ends*/
+
 
         //first turn will be always of player
         playerTurn = true;
         setUpBoard();
     }
-
 
 
     private void setUpBoard() {
@@ -265,18 +301,98 @@ public class GameActivity extends AppCompatActivity {
         findViewById(R.id.btnPlayAgain).setVisibility(View.VISIBLE);
         findViewById(R.id.btnUserProfile).setVisibility(View.VISIBLE);
 
+        /* code added by anagha 24 may starts*/
+        /*
+        Button btnUserProfile=findViewById(R.id.btnUserProfile);
+        btnUserProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(GameActivity.this, userHomeActivity.class));
+            }
+        });*/
+        /* code added by anagha 24 may ends*/
+
+
         TextView winner = findViewById(R.id.txtWinner);
         winner.setVisibility(View.VISIBLE);
         if(state == Constants.PLAYER){
                winner.setText(R.string.won);
                //TODO: Database update
+                status="won";
+                updateDB_result(status);
+
         }
 
         else if(state == Constants.COMPUTER) {
             winner.setText(R.string.lost);
             //TODO: Databse update
+                status="lost";
+                updateDB_result(status);
+
         }
 
+        return true;
+    }
+
+    /* function for db update for game score*/
+    public boolean updateDB_result(String update)
+    {
+
+        String uid = mAuth.getCurrentUser().getUid();
+        DatabaseReference reference_1= FirebaseDatabase.getInstance().getReference().child("Score").child(uid);
+        Toast.makeText(this,"in update win/lose count"+uid,Toast.LENGTH_SHORT).show();
+        reference_1.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+
+                    lost=Integer.parseInt(dataSnapshot.child("lost").getValue().toString());
+                    String rank=dataSnapshot.child("ranking").getValue().toString();
+                    String username=dataSnapshot.child("username").getValue().toString();
+                    won=Integer.parseInt(dataSnapshot.child("won").getValue().toString());
+
+                }
+                else
+                {
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        if (status.equals("lost"))
+        {
+            int lost1=lost+1;
+            reference_1.child("lost").setValue(String.valueOf(lost1));
+
+            /*HashMap hmap=new HashMap();
+            hmap.put("lost",String.valueOf(lost1));
+            reference_1.updateChildren(hmap).addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    Toast.makeText(GameActivity.this,"scores updated for lost !",Toast.LENGTH_SHORT).show();
+                }
+            });*/
+        }
+        if(status.equals("won"))
+        {
+            int won1=won+1;
+            reference_1.child("won").setValue(String.valueOf(won1));
+            /*HashMap hmap=new HashMap();
+            hmap.put("won",String.valueOf(won1));
+            reference_1.updateChildren(hmap).addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    Toast.makeText(GameActivity.this,"scores updated !",Toast.LENGTH_SHORT).show();
+                }
+            });*/
+        }
+
+        /* code added by anagha 24 may db update for game lost ends*/
         return true;
     }
 

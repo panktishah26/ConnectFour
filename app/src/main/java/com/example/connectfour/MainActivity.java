@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class MainActivity extends AppCompatActivity {
-    Button computer, friend, profile;
+    Button computer, friend, profile, btn_signout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -17,11 +19,22 @@ public class MainActivity extends AppCompatActivity {
         computer =(Button)findViewById(R.id.button);
         friend =(Button)findViewById(R.id.button2);
         profile =(Button)findViewById(R.id.button3);
+        btn_signout=findViewById(R.id.btn_signout);
+        btn_signout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                finishAffinity();
+                Intent intent = new Intent(MainActivity.this, loginActivity.class);
+                startActivity(intent);
+            }
+        });
 
         computer.setOnClickListener(new MainActivity.PlayWithComputer());
         friend.setOnClickListener(new MainActivity.PlayWithFriend());
         profile.setOnClickListener(new MainActivity.ViewProfile());
     }
+
 
 
     private class PlayWithComputer implements View.OnClickListener {
@@ -38,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class ViewProfile implements View.OnClickListener {
         public void onClick(View v) {
-            startActivity(new Intent(MainActivity.this, GameActivity.class));
+            startActivity(new Intent(MainActivity.this, userHomeActivity.class));
         }
     }
 }

@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "285506630092",
+    "firebase_url": "https://project-connect4.firebaseio.com",
+    "project_id": "project-connect4",
+    "storage_bucket": "project-connect4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285506630092:android:372db4d53e96ff01c26d69",
+        "android_client_info": {
+          "package_name": "com.example.connectfour"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "285506630092-apeq398s9ilq9a2e14bflit2ke2hnc6b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3lNiItc7d8ree_WxBULnF8IwcFxwCAns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "285506630092-apeq398s9ilq9a2e14bflit2ke2hnc6b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285506630092:android:3b523ac3d77167fac26d69",
+        "android_client_info": {
+          "package_name": "my.pkg.connect4_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "285506630092-apeq398s9ilq9a2e14bflit2ke2hnc6b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3lNiItc7d8ree_WxBULnF8IwcFxwCAns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "285506630092-apeq398s9ilq9a2e14bflit2ke2hnc6b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285506630092:android:62e808d4f873d640c26d69",
+        "android_client_info": {
+          "package_name": "my.pkg.project_connect4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "285506630092-apeq398s9ilq9a2e14bflit2ke2hnc6b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3lNiItc7d8ree_WxBULnF8IwcFxwCAns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "285506630092-apeq398s9ilq9a2e14bflit2ke2hnc6b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -6,5 +6,9 @@
     <color name="btnWhite">#fff</color>
     <color name="redCircle">#f93324</color>
     <color name="yellowCircle">#ffff00</color>
-
+    <color name="colorScreen">#383838</color>
+    <color name="user_stats">#fa7470</color>
+    <color name="user_stat_yellow">#ffff7a</color>
+    <color name="button_blue">#467fd7</color>
+    <color name="button_red">#f93324</color>
 </resources>
