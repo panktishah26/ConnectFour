@@ -13,7 +13,17 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+<<<<<<< Updated upstream
+=======
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+>>>>>>> Stashed changes
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import static com.example.connectfour.Util.savePushToken;
@@ -34,6 +44,17 @@ public class SignupActivity extends AppCompatActivity {
    // DatabaseReference reference1;
     User user1;
     Score score;
+<<<<<<< Updated upstream
+=======
+
+    /* 29 may code update starts*/
+    private DocumentReference mDocRef;
+    static boolean repeat_user = false;
+    //ArrayList<User> doctorsList=new ArrayList<>();
+    //ArrayList<User> docs = new ArrayList<User>();
+    //ArrayAdapter docsAdapter;
+    /* 29 may code update starts*/
+>>>>>>> Stashed changes
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,14 +80,13 @@ public class SignupActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 String username = ed_username.getText().toString().trim();
                 String pass = ed_password.getText().toString().trim();
                 String email = ed_email.getText().toString().trim();
-                user1.setUsername(username);
-                user1.setPassword(pass);
+                //user1.setUsername(username);
+                //user1.setPassword(pass);
                 mAuth = FirebaseAuth.getInstance();
-
-
 
                 mAuth.createUserWithEmailAndPassword(email, pass)
                         .addOnCompleteListener(task -> {
@@ -74,25 +94,60 @@ public class SignupActivity extends AppCompatActivity {
                                 Log.d("test", "loginWithEmail: ");
                                 String uid = mAuth.getCurrentUser().getUid();
 
-                                User user = new User(username,pass);
+                                User user = new User(username,pass,email);
                                 FirebaseDatabase.getInstance().getReference().child("users").child(uid)
                                         .setValue(user);
 
-                                score.setWon("0");
+                                /*score.setWon("0");
                                 score.setLost("0");
                                 score.setRanking("0");
                                 score.setUsername(username);
-                                FirebaseDatabase.getInstance().getReference().child("Score").child(uid).setValue(score);
+                                FirebaseDatabase.getInstance().getReference().child("Score").child(uid).setValue(score);*/
+
                                 String refreshedToken = FirebaseInstanceId.getInstance().getToken();
                                 savePushToken(refreshedToken, uid);
 
+<<<<<<< Updated upstream
                                 Toast.makeText(getApplicationContext(), "Sign up is successful!", Toast.LENGTH_SHORT).show();
                                 //Intent intent = new Intent(getApplicationContext(), userHomeActivity.class);
                                 //intent.putExtra("username", ed_username.getText().toString());
                                 //intent.putExtra("password", ed_password1.getText().toString());
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+=======
+                                /*changes for 29 may starts*/
+                                mDocRef = FirebaseFirestore.getInstance().document("Scores/" + uid);
+                                HashMap<String, String> userDetails = new HashMap<>();
+                                userDetails.put("won", "0");
+                                userDetails.put("lost", "0");
+                                userDetails.put("ranking", "0");
+                                userDetails.put("username", username);
+                                mDocRef.set(userDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(SignupActivity.this, "successfully added in Firestore!",
+                                                Toast.LENGTH_SHORT).show();
+                                        Log.d("SignunActivity: ","successfully initialized scores in Firestore!");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(SignupActivity.this, "Failure to add in Firestore!",
+                                                Toast.LENGTH_SHORT).show();
+                                        Log.d("SignunActivity: ","Not able to initialize scores in Firestore!");
+                                    }
+                                });
+                                /*changes for 29 may ends*/
+
+                                Toast.makeText(SignupActivity.this, "Sign up is successful!", Toast.LENGTH_SHORT).show();
+
+                                Intent intent = new Intent(SignupActivity.this, MainActivity.class);
+>>>>>>> Stashed changes
                                 startActivity(intent);
 
+                            }
+                            else
+                            {
+                                Toast.makeText(SignupActivity.this, "User already exists! Please Login!", Toast.LENGTH_LONG).show();
                             }
                         });
             }
@@ -101,7 +156,7 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         //Toast.makeText(this,"password is "+ ed_password.getText().toString(), Toast.LENGTH_SHORT);
-                        Intent intent = new Intent(getApplicationContext(), loginActivity.class);
+                        Intent intent = new Intent(SignupActivity.this, loginActivity.class);
                         startActivity(intent);
 
                     }
@@ -111,6 +166,7 @@ public class SignupActivity extends AppCompatActivity {
             }
 
             private boolean validateform() {
+
                 String email = ed_email.getText().toString().trim();
                 String username = ed_username.getText().toString().trim();
                 String pswd = ed_password.getText().toString().trim();
@@ -130,15 +186,15 @@ public class SignupActivity extends AppCompatActivity {
                     ed_username.setError("Username is required!");
                     ed_username.requestFocus();
                     return false;
-                } else if (username.length() >= 11) {
-                    ed_username.setError("Username should be upto 10 characters long only!");
+                } else if ((username.length() < 4) || (username.length() >= 11)) {
+                    ed_username.setError("Username should be between 4 to 10 characters long");
                     ed_username.requestFocus();
                     return false;
                 } else if (username.matches(noWhiteSpace)) {
                     ed_username.setError("Spaces are not allowed in username");
                     ed_username.requestFocus();
                     return false;
-                } else if (pswd.isEmpty()) {
+                }  else if (pswd.isEmpty()) {
                     ed_password.setError("Password is required!");
                     ed_password.requestFocus();
                     return false;
@@ -163,6 +219,33 @@ public class SignupActivity extends AppCompatActivity {
                     ed_confirm.requestFocus();
                     return false;
                 } else {
+
+                    //String uid = mAuth.getCurrentUser().getUid();
+                   /* DatabaseReference ref2=FirebaseDatabase.getInstance().getReference().child("users");
+                    ref2.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for(DataSnapshot ds : dataSnapshot.getChildren())
+                            {
+                               String chk_user=dataSnapshot.child("username").getValue().toString();
+                               if(username.equals(chk_user))
+                               {
+                                  repeat_user=true;
+                               }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                    if(repeat_user==true)
+                    {
+                        ed_username.setError("This username exists! Please choose another username.");
+                        ed_username.requestFocus();
+                        return false;
+                    }*/
                     return true;
                 }
 

@@ -3,6 +3,9 @@ package com.example.connectfour;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,12 +39,12 @@ private FirebaseAuth mAuth;
         finish();
         Intent intent = new Intent(userHomeActivity.this, MainActivity.class);
         startActivity(intent);
-
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_userhome);
         tv_user=findViewById(R.id.tv_user);
         tv_lost=findViewById(R.id.tv_lost);
@@ -59,7 +62,6 @@ private FirebaseAuth mAuth;
                 finishAffinity();
                 Intent intent = new Intent(userHomeActivity.this, loginActivity.class);
                 startActivity(intent);
-
             }
         });
 
@@ -78,38 +80,59 @@ private FirebaseAuth mAuth;
         //String username=intent.getStringExtra("username");
         //String pass=intent.getStringExtra("password");
 
+=======
+       /*private void showUserData2() {
+>>>>>>> Stashed changes
         String uid = mAuth.getCurrentUser().getUid();
         DatabaseReference reference2= FirebaseDatabase.getInstance().getReference().child("Score").child(uid);
-        //Query checkUser2=reference2.orderByChild("username").equalTo(username);
-        //Toast.makeText(this,"in show user data function "+uid,Toast.LENGTH_SHORT).show();
-        //tv_user.setText(username);
+
         reference2.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
-
                     //String lost=dataSnapshot.child("lost").getValue().toString();
                     tv_lost.setText(dataSnapshot.child("lost").getValue().toString());
                     tv_rank.setText(dataSnapshot.child("ranking").getValue().toString());
                     tv_user.setText(dataSnapshot.child("username").getValue().toString());
                     tv_won.setText(dataSnapshot.child("won").getValue().toString());
+<<<<<<< Updated upstream
 
                     //Toast.makeText(getApplicationContext(),"lost count "+lost,Toast.LENGTH_SHORT).show();
 
+=======
+                    updateRanking();
+>>>>>>> Stashed changes
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
+    }*/
+
+<<<<<<< Updated upstream
+    private void updateScores() {
+=======
 
 
+    private void showUserData() {
+            String uid = mAuth.getCurrentUser().getUid();
+            DocumentReference documentReference = fstore.collection("Scores").document(uid);
+            documentReference.addSnapshotListener(userHomeActivity.this, new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                    tv_lost.setText(documentSnapshot.getString("lost"));
+                    tv_user.setText(documentSnapshot.getString("username"));
+                    tv_won.setText(documentSnapshot.getString("won"));
 
+                    updateRanking();
+                }
+            });
     }
 
-    private void updateScores() {
+
+    /*private void updateScores() {
+>>>>>>> Stashed changes
         //Toast.makeText(this,"in button play",Toast.LENGTH_SHORT).show();
         String uid = mAuth.getCurrentUser().getUid();
         DatabaseReference reference2= FirebaseDatabase.getInstance().getReference().child("Score").child(uid);
@@ -120,7 +143,45 @@ private FirebaseAuth mAuth;
         won=won+1;
         reference2.child("won").setValue(String.valueOf(won));
         tv_won.setText(String.valueOf(won));
+<<<<<<< Updated upstream
 
+=======
+    }*/
+
+    private void updateRanking()
+    {
+        FirebaseFirestore.getInstance()
+                .collection("Scores")
+                .orderBy("won", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        List<DocumentSnapshot> snapshotList=queryDocumentSnapshots.getDocuments();
+                        for(DocumentSnapshot snapshot: snapshotList)
+                        {
+                            count_rank++;
+                           // if(snapshot.getString("username").equals(tv_user.getText().toString()))
+                               // tv_rank.setText(count_rank);
+                           // break;
+                            String rank=tv_user.getText().toString();
+                            if(rank.equals(snapshot.getString("username")))
+                            {
+                                tv_rank.setText(String.valueOf(count_rank));
+                            }
+                            Log.d("userHomeActivity: ","on success of "+rank+" data :"+snapshot.getString("username"));
+                        }
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(userHomeActivity.this,"fetching ranking failed ",Toast.LENGTH_SHORT).show();
+                        Log.d("userHomeActivity: ","Fetching and calculating ranking failed");
+                    }
+                });
+>>>>>>> Stashed changes
 
     }
 }

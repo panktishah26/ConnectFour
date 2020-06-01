@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+<<<<<<< Updated upstream
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,9 +26,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+=======
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+>>>>>>> Stashed changes
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -43,38 +51,47 @@ public class GameActivity extends AppCompatActivity {
     static boolean playerTurn;
 
     private static final String TAG = "GameActivity";
-    /*anagha db update start*/
+    /*database update objects start*/
     private FirebaseAuth mAuth;
+<<<<<<< Updated upstream
+=======
+    private FirebaseFirestore fstore;
+>>>>>>> Stashed changes
     static int lost;
     static int won;
     private static String status="";
     Button btnExit;
-    /*anagha db update end*/
+    /*database update objects end*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         mAuth = FirebaseAuth.getInstance();
         btnExit=findViewById(R.id.btnExit);
+        /* call getScores() to get latest score data from database for this user*/
+        getScores();
 
-
-        /* code added by anagha starts*/
         Button btnUserProfile=findViewById(R.id.btnUserProfile);
         btnUserProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+<<<<<<< Updated upstream
 
+=======
+                //animation to button added 30 may
+                Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
+                btnUserProfile.startAnimation(bounce_anim);
+>>>>>>> Stashed changes
                 startActivity(new Intent(GameActivity.this, userHomeActivity.class));
             }
         });
+
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(GameActivity.this, MainActivity.class));
             }
         });
-        /* code added by anagha ends*/
-
 
         //first turn will be always of player
         playerTurn = true;
@@ -82,6 +99,26 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
+    private void getScores()
+    {
+        String uid = mAuth.getCurrentUser().getUid();
+        DocumentReference documentReference = fstore.collection("Scores").document(uid);
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        lost=Integer.parseInt(document.getString("lost"));
+                        String rank=document.getString("ranking");
+                        String username=document.getString("username");
+                        won=Integer.parseInt(document.getString("won"));
+                    }
+                }
+            }
+
+        });
+    }
     private void setUpBoard() {
 
         //initializing the gameBoard, all zeros, i.e. no place used
@@ -301,18 +338,6 @@ public class GameActivity extends AppCompatActivity {
         findViewById(R.id.btnPlayAgain).setVisibility(View.VISIBLE);
         findViewById(R.id.btnUserProfile).setVisibility(View.VISIBLE);
 
-        /* code added by anagha 24 may starts*/
-        /*
-        Button btnUserProfile=findViewById(R.id.btnUserProfile);
-        btnUserProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(GameActivity.this, userHomeActivity.class));
-            }
-        });*/
-        /* code added by anagha 24 may ends*/
-
-
         TextView winner = findViewById(R.id.txtWinner);
         winner.setVisibility(View.VISIBLE);
         if(state == Constants.PLAYER){
@@ -334,6 +359,7 @@ public class GameActivity extends AppCompatActivity {
         return true;
     }
 
+<<<<<<< Updated upstream
     /* function for db update for game score*/
     public boolean updateDB_result(String update)
     {
@@ -394,6 +420,54 @@ public class GameActivity extends AppCompatActivity {
 
         /* code added by anagha 24 may db update for game lost ends*/
         return true;
+=======
+    /* function updateDB_result to update the database with latest game score*/
+    public void updateDB_result()
+    {
+        String uid = mAuth.getCurrentUser().getUid();
+        DocumentReference documentReference = fstore.collection("Scores").document(uid);
+        Toast.makeText(GameActivity.this,"lost till now "+lost,Toast.LENGTH_SHORT).show();
+        if (status.equals("lost"))
+        {
+            int lost1=lost+1;
+            documentReference.update("lost",String.valueOf(lost1))
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful())
+                            {
+                                Toast.makeText(getApplicationContext(), "Lost count updated", Toast.LENGTH_SHORT).show();
+                                lost=lost1;
+                            }
+                            else
+                            {
+                                Toast.makeText(getApplicationContext(), "Lost count not updated", Toast.LENGTH_SHORT).show();
+                                lost=lost1;
+                            }
+                        }
+                    });
+        }
+        if(status.equals("won"))
+        {
+            int won1=won+1;
+            documentReference.update("won",String.valueOf(won1))
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getApplicationContext(), "Win count updated", Toast.LENGTH_SHORT).show();
+                                won = won1;
+                            }
+                            else
+                            {
+                                Toast.makeText(getApplicationContext(), "Win count not updated", Toast.LENGTH_SHORT).show();
+                                won = won1;
+                            }
+                        }
+                    });
+        }
+
+>>>>>>> Stashed changes
     }
 
     public void PlayAgain(View view) {
@@ -421,6 +495,7 @@ public class GameActivity extends AppCompatActivity {
         winner.setVisibility(View.GONE);
         //player's turn to play
         playerTurn = true;
+
     }
 
 // ----------------------- Class listener starts -------------------------------------------------//
