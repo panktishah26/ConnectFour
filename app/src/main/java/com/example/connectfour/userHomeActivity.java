@@ -2,6 +2,7 @@ package com.example.connectfour;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -14,12 +15,26 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.List;
 
 public class userHomeActivity extends AppCompatActivity {
 TextView tv_user;
@@ -31,11 +46,13 @@ Button btn_logout;
 int won=0;
 int lost=0;
 private FirebaseAuth mAuth;
+private FirebaseFirestore fstore;
+int count_rank=0;
 
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
-        FirebaseAuth.getInstance().signOut();
+        //FirebaseAuth.getInstance().signOut();
         finish();
         Intent intent = new Intent(userHomeActivity.this, MainActivity.class);
         startActivity(intent);
@@ -53,11 +70,14 @@ private FirebaseAuth mAuth;
         btn_play=findViewById(R.id.btn_play);
         btn_logout=findViewById(R.id.btn_logout);
         mAuth = FirebaseAuth.getInstance();
+        fstore=FirebaseFirestore.getInstance();
         showUserData();
 
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Animation bounce_anim= AnimationUtils.loadAnimation(userHomeActivity.this,R.anim.bounce_anim);
+                btn_logout.startAnimation(bounce_anim);
                 FirebaseAuth.getInstance().signOut();
                 finishAffinity();
                 Intent intent = new Intent(userHomeActivity.this, loginActivity.class);
@@ -70,19 +90,14 @@ private FirebaseAuth mAuth;
             public void onClick(View v) {
                 //Toast.makeText(userHomeActivity.this," Button play",Toast.LENGTH_SHORT).show();
                 //updateScores();
+                Animation bounce_anim= AnimationUtils.loadAnimation(userHomeActivity.this,R.anim.bounce_anim);
+                btn_play.startAnimation(bounce_anim);
                 startActivity(new Intent(userHomeActivity.this, MainActivity.class));
             }
         });
     }
 
-       private void showUserData() {
-        //Intent intent=getIntent();
-        //String username=intent.getStringExtra("username");
-        //String pass=intent.getStringExtra("password");
-
-=======
        /*private void showUserData2() {
->>>>>>> Stashed changes
         String uid = mAuth.getCurrentUser().getUid();
         DatabaseReference reference2= FirebaseDatabase.getInstance().getReference().child("Score").child(uid);
 
@@ -95,13 +110,7 @@ private FirebaseAuth mAuth;
                     tv_rank.setText(dataSnapshot.child("ranking").getValue().toString());
                     tv_user.setText(dataSnapshot.child("username").getValue().toString());
                     tv_won.setText(dataSnapshot.child("won").getValue().toString());
-<<<<<<< Updated upstream
-
-                    //Toast.makeText(getApplicationContext(),"lost count "+lost,Toast.LENGTH_SHORT).show();
-
-=======
                     updateRanking();
->>>>>>> Stashed changes
                 }
             }
             @Override
@@ -110,9 +119,6 @@ private FirebaseAuth mAuth;
         });
     }*/
 
-<<<<<<< Updated upstream
-    private void updateScores() {
-=======
 
 
     private void showUserData() {
@@ -132,7 +138,6 @@ private FirebaseAuth mAuth;
 
 
     /*private void updateScores() {
->>>>>>> Stashed changes
         //Toast.makeText(this,"in button play",Toast.LENGTH_SHORT).show();
         String uid = mAuth.getCurrentUser().getUid();
         DatabaseReference reference2= FirebaseDatabase.getInstance().getReference().child("Score").child(uid);
@@ -143,9 +148,6 @@ private FirebaseAuth mAuth;
         won=won+1;
         reference2.child("won").setValue(String.valueOf(won));
         tv_won.setText(String.valueOf(won));
-<<<<<<< Updated upstream
-
-=======
     }*/
 
     private void updateRanking()
@@ -177,11 +179,10 @@ private FirebaseAuth mAuth;
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(userHomeActivity.this,"fetching ranking failed ",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(userHomeActivity.this,"fetching ranking failed ",Toast.LENGTH_SHORT).show();
                         Log.d("userHomeActivity: ","Fetching and calculating ranking failed");
                     }
                 });
->>>>>>> Stashed changes
 
     }
 }

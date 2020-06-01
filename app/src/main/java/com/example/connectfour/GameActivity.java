@@ -1,6 +1,7 @@
 package com.example.connectfour;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -11,29 +12,20 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.BounceInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-<<<<<<< Updated upstream
-
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-=======
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
->>>>>>> Stashed changes
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -53,10 +45,7 @@ public class GameActivity extends AppCompatActivity {
     private static final String TAG = "GameActivity";
     /*database update objects start*/
     private FirebaseAuth mAuth;
-<<<<<<< Updated upstream
-=======
     private FirebaseFirestore fstore;
->>>>>>> Stashed changes
     static int lost;
     static int won;
     private static String status="";
@@ -65,8 +54,11 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //full screen view added 30may
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game);
         mAuth = FirebaseAuth.getInstance();
+        fstore=FirebaseFirestore.getInstance();
         btnExit=findViewById(R.id.btnExit);
         /* call getScores() to get latest score data from database for this user*/
         getScores();
@@ -75,13 +67,9 @@ public class GameActivity extends AppCompatActivity {
         btnUserProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-<<<<<<< Updated upstream
-
-=======
                 //animation to button added 30 may
                 Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
                 btnUserProfile.startAnimation(bounce_anim);
->>>>>>> Stashed changes
                 startActivity(new Intent(GameActivity.this, userHomeActivity.class));
             }
         });
@@ -89,6 +77,9 @@ public class GameActivity extends AppCompatActivity {
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //animation to button added 30 may
+                Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
+                btnExit.startAnimation(bounce_anim);
                 startActivity(new Intent(GameActivity.this, MainActivity.class));
             }
         });
@@ -344,7 +335,7 @@ public class GameActivity extends AppCompatActivity {
                winner.setText(R.string.won);
                //TODO: Database update
                 status="won";
-                updateDB_result(status);
+                updateDB_result();
 
         }
 
@@ -352,81 +343,19 @@ public class GameActivity extends AppCompatActivity {
             winner.setText(R.string.lost);
             //TODO: Databse update
                 status="lost";
-                updateDB_result(status);
+                updateDB_result();
 
         }
 
         return true;
     }
 
-<<<<<<< Updated upstream
-    /* function for db update for game score*/
-    public boolean updateDB_result(String update)
-    {
-
-        String uid = mAuth.getCurrentUser().getUid();
-        DatabaseReference reference_1= FirebaseDatabase.getInstance().getReference().child("Score").child(uid);
-        Toast.makeText(this,"in update win/lose count"+uid,Toast.LENGTH_SHORT).show();
-        reference_1.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-
-                    lost=Integer.parseInt(dataSnapshot.child("lost").getValue().toString());
-                    String rank=dataSnapshot.child("ranking").getValue().toString();
-                    String username=dataSnapshot.child("username").getValue().toString();
-                    won=Integer.parseInt(dataSnapshot.child("won").getValue().toString());
-
-                }
-                else
-                {
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        if (status.equals("lost"))
-        {
-            int lost1=lost+1;
-            reference_1.child("lost").setValue(String.valueOf(lost1));
-
-            /*HashMap hmap=new HashMap();
-            hmap.put("lost",String.valueOf(lost1));
-            reference_1.updateChildren(hmap).addOnSuccessListener(new OnSuccessListener() {
-                @Override
-                public void onSuccess(Object o) {
-                    Toast.makeText(GameActivity.this,"scores updated for lost !",Toast.LENGTH_SHORT).show();
-                }
-            });*/
-        }
-        if(status.equals("won"))
-        {
-            int won1=won+1;
-            reference_1.child("won").setValue(String.valueOf(won1));
-            /*HashMap hmap=new HashMap();
-            hmap.put("won",String.valueOf(won1));
-            reference_1.updateChildren(hmap).addOnSuccessListener(new OnSuccessListener() {
-                @Override
-                public void onSuccess(Object o) {
-                    Toast.makeText(GameActivity.this,"scores updated !",Toast.LENGTH_SHORT).show();
-                }
-            });*/
-        }
-
-        /* code added by anagha 24 may db update for game lost ends*/
-        return true;
-=======
     /* function updateDB_result to update the database with latest game score*/
     public void updateDB_result()
     {
         String uid = mAuth.getCurrentUser().getUid();
         DocumentReference documentReference = fstore.collection("Scores").document(uid);
-        Toast.makeText(GameActivity.this,"lost till now "+lost,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(GameActivity.this,"lost till now "+lost,Toast.LENGTH_SHORT).show();
         if (status.equals("lost"))
         {
             int lost1=lost+1;
@@ -436,12 +365,14 @@ public class GameActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful())
                             {
-                                Toast.makeText(getApplicationContext(), "Lost count updated", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getApplicationContext(), "Lost count updated", Toast.LENGTH_SHORT).show();
+                                Log.d("GameActivity: ","Lost count updated");
                                 lost=lost1;
                             }
                             else
                             {
-                                Toast.makeText(getApplicationContext(), "Lost count not updated", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getApplicationContext(), "Lost count not updated", Toast.LENGTH_SHORT).show();
+                                Log.d("GameActivity: ","Lost count NOT updated");
                                 lost=lost1;
                             }
                         }
@@ -455,19 +386,20 @@ public class GameActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Toast.makeText(getApplicationContext(), "Win count updated", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getApplicationContext(), "Win count updated", Toast.LENGTH_SHORT).show();
+                                Log.d("GameActivity: ","Win count updated");
                                 won = won1;
                             }
                             else
                             {
-                                Toast.makeText(getApplicationContext(), "Win count not updated", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getApplicationContext(), "Win count not updated", Toast.LENGTH_SHORT).show();
+                                Log.d("GameActivity: ","Win count NOT updated");
                                 won = won1;
                             }
                         }
                     });
         }
 
->>>>>>> Stashed changes
     }
 
     public void PlayAgain(View view) {

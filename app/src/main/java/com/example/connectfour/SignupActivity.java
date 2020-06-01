@@ -5,26 +5,31 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-<<<<<<< Updated upstream
-=======
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
->>>>>>> Stashed changes
 import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.example.connectfour.Util.savePushToken;
 
@@ -44,8 +49,6 @@ public class SignupActivity extends AppCompatActivity {
    // DatabaseReference reference1;
     User user1;
     Score score;
-<<<<<<< Updated upstream
-=======
 
     /* 29 may code update starts*/
     private DocumentReference mDocRef;
@@ -54,10 +57,10 @@ public class SignupActivity extends AppCompatActivity {
     //ArrayList<User> docs = new ArrayList<User>();
     //ArrayAdapter docsAdapter;
     /* 29 may code update starts*/
->>>>>>> Stashed changes
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_signup);
         btn_login=findViewById(R.id.btn_login);
         btn_signup=findViewById(R.id.btn_signup);
@@ -107,13 +110,6 @@ public class SignupActivity extends AppCompatActivity {
                                 String refreshedToken = FirebaseInstanceId.getInstance().getToken();
                                 savePushToken(refreshedToken, uid);
 
-<<<<<<< Updated upstream
-                                Toast.makeText(getApplicationContext(), "Sign up is successful!", Toast.LENGTH_SHORT).show();
-                                //Intent intent = new Intent(getApplicationContext(), userHomeActivity.class);
-                                //intent.putExtra("username", ed_username.getText().toString());
-                                //intent.putExtra("password", ed_password1.getText().toString());
-                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-=======
                                 /*changes for 29 may starts*/
                                 mDocRef = FirebaseFirestore.getInstance().document("Scores/" + uid);
                                 HashMap<String, String> userDetails = new HashMap<>();
@@ -124,24 +120,22 @@ public class SignupActivity extends AppCompatActivity {
                                 mDocRef.set(userDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        Toast.makeText(SignupActivity.this, "successfully added in Firestore!",
-                                                Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(SignupActivity.this, "successfully added in Firestore!",Toast.LENGTH_SHORT).show();
                                         Log.d("SignunActivity: ","successfully initialized scores in Firestore!");
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(SignupActivity.this, "Failure to add in Firestore!",
-                                                Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(SignupActivity.this, "Failure to add in Firestore!", Toast.LENGTH_SHORT).show();
                                         Log.d("SignunActivity: ","Not able to initialize scores in Firestore!");
                                     }
                                 });
                                 /*changes for 29 may ends*/
 
-                                Toast.makeText(SignupActivity.this, "Sign up is successful!", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(SignupActivity.this, "Sign up is successful!", Toast.LENGTH_SHORT).show();
+                                Log.d("SignunActivity: ","Sign up is successful!");
 
                                 Intent intent = new Intent(SignupActivity.this, MainActivity.class);
->>>>>>> Stashed changes
                                 startActivity(intent);
 
                             }
@@ -203,7 +197,7 @@ public class SignupActivity extends AppCompatActivity {
                     ed_password.requestFocus();
                     return false;
                 } else if (!pswd.matches(passwordCheck)) {
-                    ed_password.setError("Password is weak! Include atleast 1 special character.");
+                    ed_password.setError("Password is weak! Include atleast 1 special character and should be atleast 6 characters long");
                     ed_password.requestFocus();
                     return false;
                 } else if (pswd.length() < 6 || pswd.length() > 15) {
