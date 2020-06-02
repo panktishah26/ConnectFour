@@ -136,7 +136,7 @@
             android:layout_column="1"
             android:gravity="right"
             android:paddingHorizontal="10dp"
-            android:text="# won"
+            android:text="."
             android:textColor="@color/user_stat_yellow"
             android:textSize="28dp"
             android:textStyle="bold"></TextView>
@@ -159,7 +159,7 @@
             android:layout_column="1"
             android:gravity="right"
             android:paddingHorizontal="10dp"
-            android:text="# lost"
+            android:text="."
             android:textColor="@color/user_stat_yellow"
             android:textSize="28dp"
             android:textStyle="bold"></TextView>
@@ -182,7 +182,7 @@
             android:layout_column="1"
             android:gravity="right"
             android:paddingHorizontal="10dp"
-            android:text="#    "
+            android:text=""
             android:textColor="@color/user_stat_yellow"
             android:textSize="28dp"
             android:textStyle="bold"></TextView>
