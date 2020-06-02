@@ -16,6 +16,13 @@ public class MainActivity extends AppCompatActivity {
     Button computer, friend, profile, btn_signout,btn_rules;
 
     @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        //do nothing
+        finishAffinity();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);

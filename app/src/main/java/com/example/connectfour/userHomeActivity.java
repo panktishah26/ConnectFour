@@ -48,6 +48,7 @@ int lost=0;
 private FirebaseAuth mAuth;
 private FirebaseFirestore fstore;
 int count_rank=0;
+private String email_id="";
 
     @Override
     public void onBackPressed() {
@@ -130,7 +131,7 @@ int count_rank=0;
                     tv_lost.setText(documentSnapshot.getString("lost"));
                     tv_user.setText(documentSnapshot.getString("username"));
                     tv_won.setText(documentSnapshot.getString("won"));
-
+                    email_id=documentSnapshot.getString("emailID");
                     updateRanking();
                 }
             });
@@ -166,12 +167,14 @@ int count_rank=0;
                            // if(snapshot.getString("username").equals(tv_user.getText().toString()))
                                // tv_rank.setText(count_rank);
                            // break;
-                            String rank=tv_user.getText().toString();
-                            if(rank.equals(snapshot.getString("username")))
+
+                            //String rank=tv_user.getText().toString();
+                            //if(rank.equals(snapshot.getString("username")))
+                            if(email_id.equals(snapshot.getString("emailID")))
                             {
                                 tv_rank.setText(String.valueOf(count_rank));
                             }
-                            Log.d("userHomeActivity: ","on success of "+rank+" data :"+snapshot.getString("username"));
+                            Log.d("userHomeActivity: ","on success of "+email_id+" data :"+snapshot.getString("username"));
                         }
 
                     }

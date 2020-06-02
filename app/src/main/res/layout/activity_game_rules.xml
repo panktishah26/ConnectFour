@@ -31,8 +31,8 @@
 
     <TextView
         android:id="@+id/tv_rules"
-        android:layout_width="316dp"
-        android:layout_height="494dp"
+        android:layout_width="310dp"
+        android:layout_height="429dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
@@ -43,6 +43,19 @@
         android:text="Rules"
         android:textColor="@android:color/white"
         android:textSize="20dp"></TextView>
+
+    <Button
+        android:id="@+id/btn_game_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="46dp"
+        android:backgroundTint="@color/button_blue"
+        android:text="Play"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"></Button>
 
 
 </RelativeLayout>

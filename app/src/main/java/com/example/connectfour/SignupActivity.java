@@ -18,18 +18,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.example.connectfour.Util.savePushToken;
 
@@ -48,7 +45,7 @@ public class SignupActivity extends AppCompatActivity {
    // DatabaseReference reference;
    // DatabaseReference reference1;
     User user1;
-    Score score;
+    //Score score;
 
     /* 29 may code update starts*/
     private DocumentReference mDocRef;
@@ -70,7 +67,7 @@ public class SignupActivity extends AppCompatActivity {
         ed_email=findViewById(R.id.ed_email);
         //rootNode=FirebaseDatabase.getInstance();
         user1=new User();
-        score=new Score();
+        //score=new Score();
        // reference=rootNode.getReference().child("User");
        // reference1=rootNode.getReference().child("Score");
 
@@ -117,6 +114,7 @@ public class SignupActivity extends AppCompatActivity {
                                 userDetails.put("lost", "0");
                                 userDetails.put("ranking", "0");
                                 userDetails.put("username", username);
+                                userDetails.put("emailID", email);
                                 mDocRef.set(userDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
@@ -165,18 +163,38 @@ public class SignupActivity extends AppCompatActivity {
                 String username = ed_username.getText().toString().trim();
                 String pswd = ed_password.getText().toString().trim();
                 String confirm_pswd = ed_confirm.getText().toString().trim();
-                String passwordCheck = "^" + "(?=.*[a-zA-Z0-9])" + "(?=.*[@#$%^&+=])" + ".{6,}" + "$";
+                String passwordCheck = "^" + "(?=.*[a-zA-Z0-9])" + "(?=.*[@#$%^&!+=])" + ".{6,}" + "$";
                 //String noWhiteSpace="\\A\\w{4,20}\\z";
                 String noWhiteSpace = ".*\\s.*";
                 if (email.isEmpty()) {
                     ed_email.setError("Email is required!");
                     ed_email.requestFocus();
                     return false;
-                } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    ed_email.setError("Enter a correct email ID!");
+                }else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    ed_email.setError("Enter a valid email ID!");
                     ed_email.requestFocus();
                     return false;
-                } else if (username.isEmpty()) {
+                }
+                else {
+                    String regExpn =
+                            "^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]{1}|[\\w-]{2,}))@"
+                                    + "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                                    + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
+                                    + "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                                    + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
+                                    + "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$";
+
+                    Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(email);
+
+                    if (!matcher.matches()) {
+                        ed_email.setError("Enter a valid email ID!");
+                        ed_email.requestFocus();
+                        return false;
+                    }
+                }
+
+                if (username.isEmpty()) {
                     ed_username.setError("Username is required!");
                     ed_username.requestFocus();
                     return false;
@@ -197,7 +215,7 @@ public class SignupActivity extends AppCompatActivity {
                     ed_password.requestFocus();
                     return false;
                 } else if (!pswd.matches(passwordCheck)) {
-                    ed_password.setError("Password is weak! Include atleast 1 special character and should be atleast 6 characters long");
+                    ed_password.setError("Password is weak! Include atleast 1 special character(@#$%^&!+=) and should be atleast 6 characters long");
                     ed_password.requestFocus();
                     return false;
                 } else if (pswd.length() < 6 || pswd.length() > 15) {
@@ -214,33 +232,7 @@ public class SignupActivity extends AppCompatActivity {
                     return false;
                 } else {
 
-                    //String uid = mAuth.getCurrentUser().getUid();
-                   /* DatabaseReference ref2=FirebaseDatabase.getInstance().getReference().child("users");
-                    ref2.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for(DataSnapshot ds : dataSnapshot.getChildren())
-                            {
-                               String chk_user=dataSnapshot.child("username").getValue().toString();
-                               if(username.equals(chk_user))
-                               {
-                                  repeat_user=true;
-                               }
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                    if(repeat_user==true)
-                    {
-                        ed_username.setError("This username exists! Please choose another username.");
-                        ed_username.requestFocus();
-                        return false;
-                    }*/
-                    return true;
+                      return true;
                 }
 
             }
