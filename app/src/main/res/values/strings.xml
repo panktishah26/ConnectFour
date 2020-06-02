@@ -3,4 +3,5 @@
     <string name="won">You Win!!</string>
     <string name="lost">You Lose</string>
     <string name="tie">Tie</string>
+    <string name="title_activity_user_list" />
 </resources>
