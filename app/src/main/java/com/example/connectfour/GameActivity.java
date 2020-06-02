@@ -23,7 +23,12 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
@@ -31,6 +36,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import static com.example.connectfour.Constants.COMPUTER;
+import static com.example.connectfour.Constants.PLAYER;
 import static java.lang.Thread.sleep;
 
 public class GameActivity extends AppCompatActivity {
@@ -49,7 +56,12 @@ public class GameActivity extends AppCompatActivity {
     static int lost;
     static int won;
     private static String status="";
-    Button btnExit;
+    Button btnExit, playAgain;
+	
+	boolean isWifi;
+    private String gameId;
+    static int multiplayer;
+	
     /*database update objects end*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +75,39 @@ public class GameActivity extends AppCompatActivity {
         /* call getScores() to get latest score data from database for this user*/
         getScores();
 
+		playAgain = findViewById(R.id.btnPlayAgain);
+					
+
+        Bundle extras = getIntent().getExtras();
+        Log.e("Extras--->", String.valueOf(extras));
+        String type = extras.getString("type");
+        if (type.equals("wifi")) {
+            isWifi = true;
+            String gameId = extras.getString("gameId");
+            setGameId(gameId);
+            setMe(extras.getString("me"));
+
+            FirebaseDatabase.getInstance().getReference().child("games")
+                    .child(gameId)
+                    .setValue(null);
+        } else {
+            //first turn will be always of player
+            playerTurn = true;
+        }
+        playAgain.setOnClickListener(v1 -> {
+            if (!isWifi) {
+                PlayAgain();
+            } else {
+                FirebaseDatabase.getInstance().getReference().child("games")
+                        .child(gameId)
+                        .setValue(null);
+
+                FirebaseDatabase.getInstance().getReference().child("games")
+                        .child(gameId)
+                        .child("restart")
+                        .setValue(System.currentTimeMillis());
+            }
+        });
         Button btnUserProfile=findViewById(R.id.btnUserProfile);
         btnUserProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,8 +129,6 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
-        //first turn will be always of player
-        playerTurn = true;
         setUpBoard();
     }
 
@@ -190,8 +233,70 @@ public class GameActivity extends AppCompatActivity {
         }
 
     }
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+        FirebaseDatabase.getInstance().getReference().child("games")
+                .child(gameId)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        if (dataSnapshot.getValue() == null) {
+                            return;
+                        }
+                        String key = dataSnapshot.getKey();
+                        if (!key.equals("restart")) {
+                            int row = Integer.parseInt(key.substring(0, 1));
+                            int col = Integer.parseInt(key.substring(2, 3));
+                            Integer shape = dataSnapshot.getValue(Integer.class);
 
+                            play(shape, row,col, GameActivity.this.gameBoard);
 
+                            if (announceWinner(row,col)) return;
+                            //player's turn, the listener will now play in the place he chooses
+                            playerTurn = !playerTurn;
+                        } else {
+                            PlayAgain();
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                        if (dataSnapshot.getValue() == null) {
+                            return;
+                        }
+                        if (dataSnapshot.getKey().equals("restart")) {
+                            PlayAgain();
+                        }
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+    public void setMe(String me) {
+        Log.e("me===>",me);
+        if (me.equals(Integer.toString(PLAYER))) {
+            playerTurn = true;
+            Toast.makeText(this, "Your turn", Toast.LENGTH_SHORT).show();
+            multiplayer = 1;
+        } else {
+            playerTurn = false;
+            Toast.makeText(this, "Opponent's turn", Toast.LENGTH_SHORT).show();
+            multiplayer = 2;
+        }
+    }
     private int getWinner(int row, int col) {
         Log.d(TAG, "getWinner: row=" + row + " col:" + col);
         //check horizontally
@@ -331,7 +436,7 @@ public class GameActivity extends AppCompatActivity {
 
         TextView winner = findViewById(R.id.txtWinner);
         winner.setVisibility(View.VISIBLE);
-        if(state == Constants.PLAYER){
+        if((!isWifi && state == PLAYER) || (isWifi && state == multiplayer)){
                winner.setText(R.string.won);
                //TODO: Database update
                 status="won";
@@ -339,7 +444,7 @@ public class GameActivity extends AppCompatActivity {
 
         }
 
-        else if(state == Constants.COMPUTER) {
+        else {
             winner.setText(R.string.lost);
             //TODO: Databse update
                 status="lost";
@@ -402,8 +507,13 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    public void PlayAgain(View view) {
+    public void PlayAgain() {
         //resets the board
+        if (isWifi) {
+            playerTurn = multiplayer == PLAYER;
+        } else {
+            playerTurn = true;
+        }
         ViewGroup cols =(ViewGroup) findViewById(R.id.wrapper);
         for(int i = 0, k = 0; i < 6 ;k++){
             View child = cols.getChildAt(k);
@@ -426,8 +536,6 @@ public class GameActivity extends AppCompatActivity {
         winner.setText(null);
         winner.setVisibility(View.GONE);
         //player's turn to play
-        playerTurn = true;
-
     }
 
 // ----------------------- Class listener starts -------------------------------------------------//
@@ -454,17 +562,31 @@ public class GameActivity extends AppCompatActivity {
             }
 
             int rowNumber = getFirstAvailableRow(colNumber);
-            //play in given column
-            play(player, rowNumber,colNumber, GameActivity.this.gameBoard);
-
-            //if the game is done, do nothing (no need for the program to play)
-            if(announceWinner(rowNumber,colNumber)) return;
-
-            //Player's turn is done -> now program's turn
-              GameActivity.playerTurn = false;
-
-            //launch program's thinking thread (thread is used to avoid blocking the UI while doing calculations)
-            new ComputerTurn().execute();
+			if (!isWifi) {
+                //if there is no row left to fill, return
+                if (getFirstAvailableRow(colNumber) == -1 || !GameActivity.playerTurn) {
+                    Toast.makeText(getApplicationContext(), "Cannot play in this column", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                //play in given column
+                play(player, rowNumber, colNumber, GameActivity.this.gameBoard);
+                //if the game is done, do nothing (no need for the program to play)
+                if(announceWinner(rowNumber,colNumber)) return;
+                //Player's turn is done -> now program's turn
+                GameActivity.playerTurn = false;
+                //launch program's thinking thread (thread is used to avoid blocking the UI while doing calculations)
+                new ComputerTurn().execute();
+            } else {
+                // This else is for multiplayer users. This will first save entry to firebase db and do further calculation in setGameId function
+                if (getFirstAvailableRow(colNumber) == -1 || !GameActivity.playerTurn) {
+                    Toast.makeText(getApplicationContext(), "Cannot play in this column or Not your turn", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                FirebaseDatabase.getInstance().getReference().child("games")
+                        .child(gameId)
+                        .child(rowNumber + "_" + colNumber)
+                        .setValue(GameActivity.multiplayer);
+            }
         }
     }
 
@@ -597,9 +719,6 @@ private class ComputerTurn extends AsyncTask<Void,Void,Integer>{
         //player's turn, the listener will now play in the place he chooses
         GameActivity.playerTurn = true;
     }
-
-
-
 }
 
 }
