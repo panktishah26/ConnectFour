@@ -1,4 +1,4 @@
-package com.group2.kotlinapp.wifi;
+package com.example.connectfour.wifi;
 
 import android.util.Log;
 import android.view.View;
@@ -11,19 +11,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.group2.kotlinapp.model.User;
-import com.group2.kotlinapp.databinding.UserListItemBinding;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.example.connectfour.User;
+import com.example.connectfour.databinding.UserListItemBinding;
 
 import java.io.IOException;
 
 
-import static com.group2.kotlinapp.Constants.FIREBASE_CLOUD_FUNCTIONS_BASE;
-import static com.group2.kotlinapp.Util.getCurrentUserId;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import static com.example.connectfour.Constants.FIREBASE_CLOUD_FUNCTIONS_BASE;
+import static com.example.connectfour.Util.getCurrentUserId;
 
 public class Holder extends RecyclerView.ViewHolder {
     public UserListItemBinding binding;
@@ -53,23 +54,22 @@ public class Holder extends RecyclerView.ViewHolder {
                                                     to,
                                                     me.getPushId(),
                                                     getCurrentUserId(),
-                                                    me.getName(),
+                                                    me.getUsername(),
                                                     "invite"))
                                     .build();
                             Log.d("sending request-->", String.valueOf(request));
                             Log.d("to", to);
                             Log.d("fromId", getCurrentUserId());
-                            Log.d("fromName", me.getName());
+                            Log.d("fromName", me.getUsername());
                             Log.d("", "");
                             client.newCall(request).enqueue(new Callback() {
                                 @Override
-                                public
-                                void onFailure(Request request, IOException e) {
-                                    //Log.d("errorrrr--->","");
+                                public void onFailure(Call call, IOException e) {
+                                    Log.d("errorrrr--->","");
                                 }
 
                                 @Override
-                                public void onResponse(Response response) throws IOException {
+                                public void onResponse(Call call, Response response) throws IOException {
                                     Log.d("success--->","");
                                     response.body().close();
                                 }

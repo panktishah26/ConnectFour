@@ -1,4 +1,4 @@
-package com.group2.kotlinapp.wifi;
+package com.example.connectfour.wifi;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,8 +8,8 @@ import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.group2.kotlinapp.R;
-import com.group2.kotlinapp.model.User;
+import com.example.connectfour.R;
+import com.example.connectfour.User;
 
 import java.util.List;
 

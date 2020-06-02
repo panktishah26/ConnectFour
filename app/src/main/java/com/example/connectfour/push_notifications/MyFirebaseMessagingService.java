@@ -9,13 +9,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
+
 import androidx.core.app.NotificationCompat;
+
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.example.connectfour.MainActivity;
 import com.example.connectfour.R;
-import com.example.connectfour.StartActivity;
+import com.example.connectfour.GameActivity;
 
+import static com.example.connectfour.Constants.PLAYER;
 import static com.example.connectfour.Util.getCurrentUserId;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
@@ -26,21 +30,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-
         String fromPushId = remoteMessage.getData().get("fromPushId");
         String fromId = remoteMessage.getData().get("fromId");
         String fromName = remoteMessage.getData().get("fromName");
         String type = remoteMessage.getData().get("type");
-        Log.d(LOG_TAG, "onMessageReceived: ");
 
         if (type.equals("invite")) {
             handleInviteIntent(fromPushId, fromId, fromName);
         } else if (type.equals("accept")) {
-            Intent In = new Intent(getBaseContext(), MainActivity.class);
+            Intent In = new Intent(getBaseContext(), GameActivity.class);
             In.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+Log.e("here---->","why it isn't going to game page");
             startActivity(In
                     .putExtra("type", "wifi")
-                    .putExtra("me", "x")
+                    .putExtra("me", Integer.toString(PLAYER))
                     .putExtra("gameId", getCurrentUserId() + "-" + fromId)
                     .putExtra("withId", fromId));
         } else if (type.equals("reject")) {
@@ -51,10 +54,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                             .setPriority(PRIORITY_MAX)
                             .setContentTitle(String.format("%s rejected your invite!", fromName));
 
-            Intent resultIntent = new Intent(this, MainActivity.class)
+            Intent resultIntent = new Intent(this, GameActivity.class)
                     .putExtra("type", "wifi");
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-            stackBuilder.addParentStack(StartActivity.class);
+            stackBuilder.addParentStack(MainActivity.class);
             stackBuilder.addNextIntent(resultIntent);
             PendingIntent resultPendingIntent =
                     stackBuilder.getPendingIntent(
@@ -86,12 +89,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .putExtra("to", fromPushId);
         PendingIntent pendingIntentAccept = PendingIntent.getBroadcast(this, 2, acceptIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent resultIntent = new Intent(this, MainActivity.class)
+        Intent resultIntent = new Intent(this, GameActivity.class)
                 .putExtra("type", "wifi")
                 .putExtra("withId", fromId)
                 .putExtra("to", fromPushId);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(StartActivity.class);
+        stackBuilder.addParentStack(MainActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(

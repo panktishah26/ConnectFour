@@ -1,4 +1,4 @@
-package com.group2.kotlinapp.wifi;
+package com.example.connectfour.wifi;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -6,15 +6,16 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.connectfour.databinding.ActivityUserListBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.group2.kotlinapp.R;
-import com.group2.kotlinapp.Util;
-import com.group2.kotlinapp.databinding.ActivityUserListBinding;
-import com.group2.kotlinapp.model.User;
+import com.example.connectfour.R;
+import com.example.connectfour.Util;
+import com.example.connectfour.User;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,13 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.example.connectfour.GameActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.example.connectfour.MainActivity;
-import com.example.connectfour.model.User;
+import com.example.connectfour.User;
 
 import java.io.IOException;
 
@@ -20,7 +22,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static com.example.connectfour.Constants.COMPUTER;
 import static com.example.connectfour.Constants.FIREBASE_CLOUD_FUNCTIONS_BASE;
+import static com.example.connectfour.Constants.PLAYER;
 import static com.example.connectfour.Util.getCurrentUserId;
 
 public class MyReceiver extends BroadcastReceiver {
@@ -28,7 +32,6 @@ public class MyReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(LOG_TAG, "onReceive: " + intent.getAction());
         FirebaseDatabase.getInstance().getReference().child("users")
                 .child(getCurrentUserId())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -40,17 +43,15 @@ public class MyReceiver extends BroadcastReceiver {
 
                         String to = intent.getExtras().getString("to");
                         String withId = intent.getExtras().getString("withId");
-
                         String format = String
                                 .format("%s/sendNotification?to=%s&fromPushId=%s&fromId=%s&fromName=%s&type=%s",
                                         FIREBASE_CLOUD_FUNCTIONS_BASE,
                                         to,
                                         me.getPushId(),
                                         getCurrentUserId(),
-                                        me.getName(),
+                                        me.getUsername(),
                                         intent.getAction());
 
-                        Log.d(LOG_TAG, "onDataChange: " + format);
                         Request request = new Request.Builder()
                                 .url(format)
                                 .build();
@@ -72,11 +73,11 @@ public class MyReceiver extends BroadcastReceiver {
                             FirebaseDatabase.getInstance().getReference().child("games")
                                     .child(gameId)
                                     .setValue(null);
-                            Intent In = new Intent(context, MainActivity.class);
+                            Intent In = new Intent(context, GameActivity.class);
                             In.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(In
                                     .putExtra("type", "wifi")
-                                    .putExtra("me", "o")
+                                    .putExtra("me", Integer.toString(COMPUTER))
                                     .putExtra("gameId", gameId)
                                     .putExtra("with", withId));
                         }

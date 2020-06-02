@@ -429,8 +429,7 @@
             android:textColor="@android:color/white"
             android:textSize="15dp"
             android:padding="10dp"
-            android:visibility="gone"
-            android:onClick="PlayAgain">
+            android:visibility="gone">
         </Button>
 
         <View
