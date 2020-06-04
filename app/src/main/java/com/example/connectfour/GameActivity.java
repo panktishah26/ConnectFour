@@ -2,11 +2,15 @@ package com.example.connectfour;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -56,11 +60,18 @@ public class GameActivity extends AppCompatActivity {
     static int lost;
     static int won;
     private static String status="";
-    Button btnExit, playAgain;
+    Button btnExit;
 	
 	boolean isWifi;
     private String gameId;
     static int multiplayer;
+
+    //Dialog to show winner or looser popup
+    Dialog winner;
+
+
+    Button btnPlayAgain;
+    Button btnUserProfile;
 	
     /*database update objects end*/
     @Override
@@ -74,8 +85,8 @@ public class GameActivity extends AppCompatActivity {
         btnExit=findViewById(R.id.btnExit);
         /* call getScores() to get latest score data from database for this user*/
         getScores();
+        winner = new Dialog(this);
 
-		playAgain = findViewById(R.id.btnPlayAgain);
 					
 
         Bundle extras = getIntent().getExtras();
@@ -94,30 +105,6 @@ public class GameActivity extends AppCompatActivity {
             //first turn will be always of player
             playerTurn = true;
         }
-        playAgain.setOnClickListener(v1 -> {
-            if (!isWifi) {
-                PlayAgain();
-            } else {
-                FirebaseDatabase.getInstance().getReference().child("games")
-                        .child(gameId)
-                        .setValue(null);
-
-                FirebaseDatabase.getInstance().getReference().child("games")
-                        .child(gameId)
-                        .child("restart")
-                        .setValue(System.currentTimeMillis());
-            }
-        });
-        Button btnUserProfile=findViewById(R.id.btnUserProfile);
-        btnUserProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //animation to button added 30 may
-                Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
-                btnUserProfile.startAnimation(bounce_anim);
-                startActivity(new Intent(GameActivity.this, userHomeActivity.class));
-            }
-        });
 
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,6 +192,25 @@ public class GameActivity extends AppCompatActivity {
         return -1;
     }
 
+    public int getFrameId(int colNumber) {
+        //return View's id from column number
+        switch (colNumber) {
+            case 0:
+                return R.id.frame1;
+            case 1:
+                return R.id.frame2;
+            case 2:
+                return R.id.frame3;
+            case 3:
+                return R.id.frame4;
+            case 4:
+                return R.id.frame5;
+            case 5:
+                return R.id.frame6;
+        }
+        return -1;
+    }
+
 
     //method to return the first available row of any column
     public int getFirstAvailableRow(int colNumber) {
@@ -217,27 +223,56 @@ public class GameActivity extends AppCompatActivity {
         return -1;
     }
 
-    public void play(int player, int rowNumber,int colNumber, int[][] gameBoard) {
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void play(int player, int rowNumber, int colNumber, int[][] gameBoard) {
          rowNumber = getFirstAvailableRow(colNumber);
         int columnId = getColumnId(colNumber);
 
         //if current player is you , change the available row to red color
         if (player == Constants.PLAYER) {
-            //dropDisk(rowNumber,colNumber,player);
-            ((ViewGroup) findViewById(columnId)).getChildAt(6 - rowNumber).setBackground(getResources().getDrawable(R.drawable.you_circle));
+            dropDisk(rowNumber, colNumber, columnId, player);
             gameBoard[colNumber][rowNumber] = Constants.PLAYER;
-        } else if (player == Constants.COMPUTER) {
-            //dropDisk(rowNumber,colNumber,player);
-            ((ViewGroup) findViewById(columnId)).getChildAt(6 - rowNumber).setBackground(getResources().getDrawable(R.drawable.computer_circle));
-            gameBoard[colNumber][rowNumber] = Constants.COMPUTER;
+        }
+        else if (player == Constants.COMPUTER) {
+                dropDisk(rowNumber, colNumber, columnId, player);
+                gameBoard[colNumber][rowNumber] = Constants.COMPUTER;
         }
 
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public  void dropDisk(int rowNumber, int colNumber, int columnId, int player){
+        View target =  ((ViewGroup) findViewById(columnId)).getChildAt(6 - rowNumber+1);
+        int frameId =   getFrameId(colNumber);
+        ImageView source = (ImageView) ((ViewGroup) this.findViewById(frameId)).getChildAt(6-rowNumber);
+
+        if(player == Constants.PLAYER)
+            source.setImageResource(R.drawable.you_circle);
+        if(player == Constants.COMPUTER)
+            source.setImageResource(R.drawable.computer_circle);
+
+
+
+        source.animate()
+                .y(target.getY())
+                .setDuration(600)
+                .setInterpolator(new BounceInterpolator())
+                .start();
+
+
+
+        if(player == Constants.PLAYER)
+            target.setBackground(source.getForeground());
+        if(player == Constants.COMPUTER)
+            target.setBackground(source.getForeground());
+    }
+
     public void setGameId(String gameId) {
         this.gameId = gameId;
         FirebaseDatabase.getInstance().getReference().child("games")
                 .child(gameId)
                 .addChildEventListener(new ChildEventListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         if (dataSnapshot.getValue() == null) {
@@ -255,7 +290,7 @@ public class GameActivity extends AppCompatActivity {
                             //player's turn, the listener will now play in the place he chooses
                             playerTurn = !playerTurn;
                         } else {
-                            PlayAgain();
+                            playAgain();
                         }
                     }
 
@@ -265,7 +300,7 @@ public class GameActivity extends AppCompatActivity {
                             return;
                         }
                         if (dataSnapshot.getKey().equals("restart")) {
-                            PlayAgain();
+                            playAgain();
                         }
                     }
 
@@ -423,6 +458,16 @@ public class GameActivity extends AppCompatActivity {
                 break;
         }
 
+        //checks if all the columns are full
+        boolean tie = true;
+        for(int k=0;k<6;k++){
+            if(gameBoard[k][6]==0){
+                tie=false;
+                break;
+            }
+        }
+
+        if(tie) return -1;
 
         return 0;
     }
@@ -431,28 +476,82 @@ public class GameActivity extends AppCompatActivity {
         int state = getWinner(colNumber,rowNumber);
         if(state==0) return false;
 
-        findViewById(R.id.btnPlayAgain).setVisibility(View.VISIBLE);
-        findViewById(R.id.btnUserProfile).setVisibility(View.VISIBLE);
-
-        TextView winner = findViewById(R.id.txtWinner);
-        winner.setVisibility(View.VISIBLE);
         if((!isWifi && state == PLAYER) || (isWifi && state == multiplayer)){
-               winner.setText(R.string.won);
-               //TODO: Database update
                 status="won";
                 updateDB_result();
-
+                showWinnerPopup();
         }
 
-        else {
-            winner.setText(R.string.lost);
-            //TODO: Databse update
+        else if((!isWifi && state == COMPUTER) || (isWifi && state != multiplayer)){
                 status="lost";
                 updateDB_result();
-
+                showLoserPopup();
         }
 
+        else if(state==-1){
+            showTiePopup();
+        }
         return true;
+    }
+
+    private void showTiePopup() {
+        Log.d(TAG,"inside showTiePopup()");
+        winner.setContentView(R.layout.tie_popup);
+        winner.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        winner.show();
+        buttonClickHandlers();
+    }
+
+
+
+    private void showLoserPopup() {
+        Log.d(TAG,"inside showLoserPopup()");
+        winner.setContentView(R.layout.loser_popup);
+        winner.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        winner.show();
+        buttonClickHandlers();
+    }
+
+    private void showWinnerPopup() {
+        Log.d(TAG,"inside showWinnerPopup()");
+        winner.setContentView(R.layout.winner_popup);
+        winner.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        winner.show();
+        buttonClickHandlers();
+    }
+
+    public  void buttonClickHandlers(){
+        btnPlayAgain = (Button) winner.findViewById(R.id.btnPlayAgain);
+        btnUserProfile = (Button)winner.findViewById(R.id.btnUserProfile);
+        btnPlayAgain.setOnClickListener(v1 -> {
+            playAgain();
+
+         /*  if (!isWifi) {
+                playAgain();
+            } else {
+                FirebaseDatabase.getInstance().getReference().child("games")
+                        .child(gameId)
+                        .setValue(null);
+
+                FirebaseDatabase.getInstance().getReference().child("games")
+                        .child(gameId)
+                        .child("restart")
+                        .setValue(System.currentTimeMillis());
+            }*/
+        });
+
+
+
+        btnUserProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //animation to button added 30 may
+                Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
+                btnUserProfile.startAnimation(bounce_anim);
+                startActivity(new Intent(GameActivity.this, userHomeActivity.class));
+            }
+        });
+
     }
 
     /* function updateDB_result to update the database with latest game score*/
@@ -507,35 +606,10 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    public void PlayAgain() {
-        //resets the board
-        if (isWifi) {
-            playerTurn = multiplayer == PLAYER;
-        } else {
-            playerTurn = true;
-        }
-        ViewGroup cols =(ViewGroup) findViewById(R.id.wrapper);
-        for(int i = 0, k = 0; i < 6 ;k++){
-            View child = cols.getChildAt(k);
-            if (!(child instanceof ViewGroup)){continue;}
-            ViewGroup col = (ViewGroup) child;
-            for(int j = 0 ; j < col.getChildCount() ; j++){
-                col.getChildAt(j).setBackground(getResources().getDrawable(R.drawable.white_circle));
-            }
-            i++;
-        }
-
-        //resets the board-array
-        for (int i = 0 ; i < 6 ; i++) {Arrays.fill(gameBoard[i], 0);}
-
-        // hide the button and textview
-        findViewById(R.id.btnPlayAgain).setVisibility(View.GONE);
-        findViewById(R.id.btnUserProfile).setVisibility(View.GONE);
-
-        TextView winner = findViewById(R.id.txtWinner);
-        winner.setText(null);
-        winner.setVisibility(View.GONE);
-        //player's turn to play
+    public void playAgain() {
+            Intent i = getIntent();
+            finish();
+            startActivity(i);
     }
 
 // ----------------------- Class listener starts -------------------------------------------------//
@@ -553,6 +627,7 @@ public class GameActivity extends AppCompatActivity {
 
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onClick(View v) {
             //if there is no row left to fill, return
