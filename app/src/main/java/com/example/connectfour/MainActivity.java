@@ -69,7 +69,9 @@ public class MainActivity extends AppCompatActivity {
             //BounceInterpolator interpolator=new BounceInterpolator(0.2,20);
             //bounce_anim.setInterpolator(interpolator);
             computer.startAnimation(bounce_anim);
-            startActivity(new Intent(MainActivity.this, GameActivity.class));
+            //changed below to introduce levels of difficulty
+            //startActivity(new Intent(MainActivity.this, GameActivity.class));
+            startActivity(new Intent(MainActivity.this, GameLevelActivity.class));
         }
     }
 
