@@ -33,6 +33,7 @@ public class GameLevelActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent=new Intent(GameLevelActivity.this,GameActivity.class);
                 intent.putExtra("level",Constants.MODE_EASY);
+                intent.putExtra("type", "single");
                 startActivity(intent);
             }
         });
@@ -42,6 +43,7 @@ public class GameLevelActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent=new Intent(GameLevelActivity.this,GameActivity.class);
                 intent.putExtra("level",Constants.MODE_MEDIUM);
+                intent.putExtra("type", "single");
                 startActivity(intent);
             }
         });
@@ -51,6 +53,7 @@ public class GameLevelActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent=new Intent(GameLevelActivity.this,GameActivity.class);
                 intent.putExtra("level",Constants.MODE_HARD);
+                intent.putExtra("type", "single");
                 startActivity(intent);
             }
         });
