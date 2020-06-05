@@ -32,8 +32,14 @@
         <activity
             android:name=".userHomeActivity"
             android:theme="@style/splashScreen" />
-        <activity android:name=".GameRules"
-            android:theme="@style/splashScreen"></activity>
+
+        <activity
+            android:name=".GameRules"
+            android:theme="@style/splashScreen" />
+        <activity
+            android:name=".GameLevelActivity"
+            android:theme="@style/splashScreen" ></activity>
+
         <activity
             android:name=".wifi.UserListActivity"
             android:label="@string/title_activity_user_list"
@@ -53,6 +59,7 @@
         </service>
 
         <receiver android:name=".push_notifications.MyReceiver"/>
+
 
 
     </application>

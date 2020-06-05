@@ -92,30 +92,33 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="137dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="123dp"
         android:layout_marginEnd="132dp"
         android:layout_marginRight="132dp"
-        android:layout_marginBottom="348dp"
+        android:layout_marginBottom="367dp"
         android:text="Game Stats :"
         android:textColor="@android:color/white"
         android:textSize="27dp"
         android:textStyle="bold"></TextView>
 
+
     <GridLayout
         android:id="@+id/gl_userstats"
-        android:paddingHorizontal="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="28dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="71dp"
         android:layout_marginTop="200dp"
-        android:layout_marginEnd="63dp"
-        android:layout_marginRight="63dp"
-        android:layout_marginBottom="187dp"
+        android:layout_marginEnd="68dp"
+        android:layout_marginRight="68dp"
+        android:layout_marginBottom="236dp"
         android:columnCount="2"
+        android:paddingHorizontal="10dp"
         android:rowCount="3">
 
         <TextView
@@ -189,6 +192,20 @@
 
     </GridLayout>
 
+    <TextView
+        android:id="@+id/tv_topplayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="166dp"
+        android:autoLink="all"
+        android:clickable="true"
+        android:text="Click here to view Top 3 players"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="20sp"
+        android:textStyle="bold"></TextView>
+
     <Button
         android:id="@+id/btn_play"
         android:layout_width="wrap_content"
@@ -200,7 +217,7 @@
         android:layout_marginLeft="67dp"
         android:layout_marginEnd="256dp"
         android:layout_marginRight="256dp"
-        android:layout_marginBottom="94dp"
+        android:layout_marginBottom="70dp"
         android:backgroundTint="@color/button_blue"
         android:text="Play"
         android:textColor="@android:color/white"
@@ -218,7 +235,7 @@
         android:layout_marginLeft="218dp"
         android:layout_marginEnd="81dp"
         android:layout_marginRight="81dp"
-        android:layout_marginBottom="94dp"
+        android:layout_marginBottom="70dp"
         android:backgroundTint="@color/button_red"
         android:text="Logout"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"

@@ -1,7 +1,10 @@
 package com.example.connectfour;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -13,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -40,7 +44,7 @@ public class userHomeActivity extends AppCompatActivity {
 TextView tv_user;
 TextView tv_won;
 TextView tv_lost;
-TextView tv_rank;
+TextView tv_rank,tv_topplayer;
 Button btn_play;
 Button btn_logout;
 int won=0;
@@ -49,6 +53,7 @@ private FirebaseAuth mAuth;
 private FirebaseFirestore fstore;
 int count_rank=0;
 private String email_id="";
+private static String str_top_players="";
 
     @Override
     public void onBackPressed() {
@@ -68,6 +73,12 @@ private String email_id="";
         tv_lost=findViewById(R.id.tv_lost);
         tv_won=findViewById(R.id.tv_won);
         tv_rank=findViewById(R.id.tv_rank);
+        //tv_topplayer link to display top 3 players
+        tv_topplayer=findViewById(R.id.tv_topplayer);
+        SpannableString spanstr= new SpannableString(tv_topplayer.getText().toString());
+        spanstr.setSpan(tv_topplayer,0,tv_topplayer.getText().toString().length(),0);
+        tv_topplayer.setText(spanstr);
+
         btn_play=findViewById(R.id.btn_play);
         btn_logout=findViewById(R.id.btn_logout);
         mAuth = FirebaseAuth.getInstance();
@@ -94,6 +105,31 @@ private String email_id="";
                 Animation bounce_anim= AnimationUtils.loadAnimation(userHomeActivity.this,R.anim.bounce_anim);
                 btn_play.startAnimation(bounce_anim);
                 startActivity(new Intent(userHomeActivity.this, MainActivity.class));
+            }
+        });
+
+
+
+        tv_topplayer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder=new AlertDialog.Builder(userHomeActivity.this);
+                View view=getLayoutInflater().inflate(R.layout.dialog_top_players,null);
+                TextView tv_top_list=view.findViewById(R.id.tv_top_list);
+                //Button btn_ok=view.findViewById(R.id.btn_ok);
+                tv_top_list.setText(str_top_players);
+
+
+                builder.setView(view)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .create()
+                        .show();
+
             }
         });
     }
@@ -153,9 +189,11 @@ private String email_id="";
 
     private void updateRanking()
     {
+        str_top_players="";
         FirebaseFirestore.getInstance()
                 .collection("Scores")
-                .orderBy("won", Query.Direction.DESCENDING)
+                //.orderBy("won", Query.Direction.DESCENDING)
+                .orderBy("ranking", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -170,6 +208,14 @@ private String email_id="";
 
                             //String rank=tv_user.getText().toString();
                             //if(rank.equals(snapshot.getString("username")))
+
+                            if(count_rank<4)
+                            {
+
+                                str_top_players+=count_rank+". "+snapshot.getString("username");
+                                str_top_players+="\n\n";
+                            }
+
                             if(email_id.equals(snapshot.getString("emailID")))
                             {
                                 tv_rank.setText(String.valueOf(count_rank));

@@ -61,6 +61,7 @@ public class GameActivity extends AppCompatActivity {
     static int lost;
     static int won;
     private static String status="";
+    private static int gamelevel;
     Button btnExit;
 	
 	boolean isWifi;
@@ -77,12 +78,26 @@ public class GameActivity extends AppCompatActivity {
     Button btnUserProfile;
 	
     /*database update objects end*/
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        finish();
+        Intent intent = new Intent(GameActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //full screen view added 30may
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game);
+
+        //added for getting value for difficulty level
+        Intent intent = getIntent();
+        gamelevel =intent.getIntExtra("level",4);
+
         mAuth = FirebaseAuth.getInstance();
         fstore=FirebaseFirestore.getInstance();
         btnExit=findViewById(R.id.btnExit);
@@ -588,18 +603,19 @@ public class GameActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful())
                             {
-                                //Toast.makeText(getApplicationContext(), "Lost count updated", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Lost count updated", Toast.LENGTH_SHORT).show();
                                 Log.d("GameActivity: ","Lost count updated");
-                                lost=lost1;
+                                //lost=lost1;
                             }
                             else
                             {
-                                //Toast.makeText(getApplicationContext(), "Lost count not updated", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Lost count not updated", Toast.LENGTH_SHORT).show();
                                 Log.d("GameActivity: ","Lost count NOT updated");
-                                lost=lost1;
+                                //lost=lost1;
                             }
                         }
                     });
+            lost=lost1;
         }
         if(status.equals("won"))
         {
@@ -611,17 +627,49 @@ public class GameActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 //Toast.makeText(getApplicationContext(), "Win count updated", Toast.LENGTH_SHORT).show();
                                 Log.d("GameActivity: ","Win count updated");
-                                won = won1;
+                                //won = won1;
                             }
                             else
                             {
                                 //Toast.makeText(getApplicationContext(), "Win count not updated", Toast.LENGTH_SHORT).show();
                                 Log.d("GameActivity: ","Win count NOT updated");
-                                won = won1;
+                                //won = won1;
                             }
                         }
                     });
+            won = won1;
         }
+
+        float rank_to_update=0;
+        if(won>0){
+        float fl_lost=lost;
+        float fl_won=won;
+        rank_to_update=fl_won/(fl_lost+fl_won);
+        rank_to_update=rank_to_update*100.0f;}
+        documentReference.update("ranking",String.valueOf(rank_to_update))
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getApplicationContext(), "Ranking updated", Toast.LENGTH_SHORT).show();
+                            Log.d("GameActivity: ","Ranking of player updated");
+
+                        }
+                        else
+                        {
+                            Toast.makeText(getApplicationContext(), "Ranking not updated", Toast.LENGTH_SHORT).show();
+                            Log.d("GameActivity: ","Ranking of player NOT updated");
+
+                        }
+                    }
+                });
+
+
+
+    }
+
+    public void update_rank(int won,int lost)
+    {
 
     }
 
@@ -792,7 +840,8 @@ private class ComputerTurn extends AsyncTask<Void,Void,Integer>{
     @Override
         protected Integer doInBackground(Void... params) {
 
-                maxDepth = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getInt(Constants.DIFFICULTY,Constants.MODE_MEDIUM);
+                //maxDepth = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getInt(Constants.DIFFICULTY,Constants.MODE_MEDIUM);
+                maxDepth = gamelevel;
                 return minimax();
         }
 
