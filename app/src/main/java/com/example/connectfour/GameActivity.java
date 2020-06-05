@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -65,7 +66,9 @@ public class GameActivity extends AppCompatActivity {
 	boolean isWifi;
     private String gameId;
     static int multiplayer;
-
+    ChildEventListener childEventListener;
+    ChildEventListener listener;
+    DatabaseReference GameDB;
     //Dialog to show winner or looser popup
     Dialog winner;
 
@@ -112,6 +115,10 @@ public class GameActivity extends AppCompatActivity {
                 //animation to button added 30 may
                 Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
                 btnExit.startAnimation(bounce_anim);
+                if(isWifi) {
+                    GameDB.removeEventListener(childEventListener);
+                    GameDB.removeEventListener(listener);
+                }
                 startActivity(new Intent(GameActivity.this, MainActivity.class));
             }
         });
@@ -269,56 +276,66 @@ public class GameActivity extends AppCompatActivity {
 
     public void setGameId(String gameId) {
         this.gameId = gameId;
-        FirebaseDatabase.getInstance().getReference().child("games")
-                .child(gameId)
-                .addChildEventListener(new ChildEventListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.M)
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        if (dataSnapshot.getValue() == null) {
-                            return;
-                        }
-                        String key = dataSnapshot.getKey();
-                        if (!key.equals("restart")) {
-                            int row = Integer.parseInt(key.substring(0, 1));
-                            int col = Integer.parseInt(key.substring(2, 3));
-                            Integer shape = dataSnapshot.getValue(Integer.class);
+        GameDB = FirebaseDatabase.getInstance().getReference().child("games").child(gameId);
+        Log.e("MultiPlayAgain----->", String.valueOf(listener));
+        Log.e("MultiPlayAgain----->", String.valueOf(childEventListener));
+        // Add a new propery for the listener
+//        if (GameDB != null && childEventListener != null) {
+//            listener.removeChildEventListener(childEventListener);
+//        }
+        childEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (dataSnapshot.getValue() == null) {
+                    return;
+                }
+                String key = dataSnapshot.getKey();
+                if (!key.equals("restart")) {
+                    int row = Integer.parseInt(key.substring(0, 1));
+                    int col = Integer.parseInt(key.substring(2, 3));
+                    Integer shape = dataSnapshot.getValue(Integer.class);
+                    Log.e("Row this---->", "here");
+                    play(shape, row, col, GameActivity.this.gameBoard);
 
-                            play(shape, row,col, GameActivity.this.gameBoard);
+                    if (announceWinner(row, col)) return;
+                    //player's turn, the listener will now play in the place he chooses
+                    playerTurn = !playerTurn;
+                } else {
+                    playAgain();
+                }
+            }
 
-                            if (announceWinner(row,col)) return;
-                            //player's turn, the listener will now play in the place he chooses
-                            playerTurn = !playerTurn;
-                        } else {
-                            playAgain();
-                        }
-                    }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                if (dataSnapshot.getValue() == null) {
+                    return;
+                }
+                if (dataSnapshot.getKey().equals("restart")) {
+                    playAgain();
+                }
+            }
 
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                        if (dataSnapshot.getValue() == null) {
-                            return;
-                        }
-                        if (dataSnapshot.getKey().equals("restart")) {
-                            playAgain();
-                        }
-                    }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                GameDB.removeEventListener(childEventListener);
+                GameDB.removeEventListener(listener);
+                playAgain();
 
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                    }
+            }
 
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-                    }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+            }
 
-                    }
-                });
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        listener = GameDB.addChildEventListener(childEventListener);
     }
     public void setMe(String me) {
         Log.e("me===>",me);
@@ -524,9 +541,7 @@ public class GameActivity extends AppCompatActivity {
         btnPlayAgain = (Button) winner.findViewById(R.id.btnPlayAgain);
         btnUserProfile = (Button)winner.findViewById(R.id.btnUserProfile);
         btnPlayAgain.setOnClickListener(v1 -> {
-            playAgain();
-
-         /*  if (!isWifi) {
+            if (!isWifi) {
                 playAgain();
             } else {
                 FirebaseDatabase.getInstance().getReference().child("games")
@@ -537,7 +552,7 @@ public class GameActivity extends AppCompatActivity {
                         .child(gameId)
                         .child("restart")
                         .setValue(System.currentTimeMillis());
-            }*/
+            }
         });
 
 
@@ -548,6 +563,10 @@ public class GameActivity extends AppCompatActivity {
                 //animation to button added 30 may
                 Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
                 btnUserProfile.startAnimation(bounce_anim);
+                if(isWifi) {
+                    GameDB.removeEventListener(childEventListener);
+                    GameDB.removeEventListener(listener);
+                }
                 startActivity(new Intent(GameActivity.this, userHomeActivity.class));
             }
         });
@@ -630,12 +649,6 @@ public class GameActivity extends AppCompatActivity {
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onClick(View v) {
-            //if there is no row left to fill, return
-            if (getFirstAvailableRow(colNumber) == -1 || !GameActivity.playerTurn) {
-                Toast.makeText(getApplicationContext(), "Cannot play in this column", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
             int rowNumber = getFirstAvailableRow(colNumber);
 			if (!isWifi) {
                 //if there is no row left to fill, return
@@ -783,6 +796,7 @@ private class ComputerTurn extends AsyncTask<Void,Void,Integer>{
                 return minimax();
         }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onPostExecute(Integer col) {
         int row = getFirstAvailableRow(col);
