@@ -7,4 +7,5 @@ public class Constants {
     public static final int MODE_MEDIUM = 4;
     public static final int MODE_HARD = 6;
     public static final int COMPUTER = 2;
+    public static final String FIREBASE_CLOUD_FUNCTIONS_BASE = "https://us-central1-project-connect4.cloudfunctions.net";
 }

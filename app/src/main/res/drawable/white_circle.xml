@@ -3,6 +3,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <solid android:color="@color/btnWhite"/>
-
-
+    <stroke android:color="#717372" android:width="2dp"/>
 </shape>

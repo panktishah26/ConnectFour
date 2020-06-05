@@ -32,12 +32,37 @@
         <activity
             android:name=".userHomeActivity"
             android:theme="@style/splashScreen" />
+
         <activity
             android:name=".GameRules"
             android:theme="@style/splashScreen" />
         <activity
             android:name=".GameLevelActivity"
             android:theme="@style/splashScreen" ></activity>
+
+        <activity
+            android:name=".wifi.UserListActivity"
+            android:label="@string/title_activity_user_list"
+            android:theme="@style/AppTheme"></activity>
+
+        <service
+            android:name=".push_notifications.MyFirebaseInstanceIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".push_notifications.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <receiver android:name=".push_notifications.MyReceiver"/>
+
+
+
     </application>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
 </manifest>

@@ -10,7 +10,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
+import com.example.connectfour.wifi.UserListActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
     Button computer, friend, profile, btn_signout,btn_rules;
@@ -69,9 +71,12 @@ public class MainActivity extends AppCompatActivity {
             //BounceInterpolator interpolator=new BounceInterpolator(0.2,20);
             //bounce_anim.setInterpolator(interpolator);
             computer.startAnimation(bounce_anim);
+
             //changed below to introduce levels of difficulty
             //startActivity(new Intent(MainActivity.this, GameActivity.class));
             startActivity(new Intent(MainActivity.this, GameLevelActivity.class));
+            //startActivity(new Intent(MainActivity.this, GameActivity.class).putExtra("type", "single"));
+
         }
     }
 
@@ -79,7 +84,13 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             Animation bounce_anim= AnimationUtils.loadAnimation(MainActivity.this,R.anim.bounce_anim);
             friend.startAnimation(bounce_anim);
-            startActivity(new Intent(MainActivity.this, GameActivity.class));
+            //startActivity(new Intent(MainActivity.this, GameActivity.class));
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if(currentUser == null) {
+                startActivity(new Intent(MainActivity.this, loginActivity.class));
+            } else {
+                startActivity(new Intent(MainActivity.this, UserListActivity.class));
+            }
         }
     }
 

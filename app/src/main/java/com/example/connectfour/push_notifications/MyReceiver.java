@@ -1,0 +1,93 @@
+package com.example.connectfour.push_notifications;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.example.connectfour.GameActivity;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.example.connectfour.MainActivity;
+import com.example.connectfour.User;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import static com.example.connectfour.Constants.COMPUTER;
+import static com.example.connectfour.Constants.FIREBASE_CLOUD_FUNCTIONS_BASE;
+import static com.example.connectfour.Constants.PLAYER;
+import static com.example.connectfour.Util.getCurrentUserId;
+
+public class MyReceiver extends BroadcastReceiver {
+    private static final String LOG_TAG = "MyReceiver";
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        FirebaseDatabase.getInstance().getReference().child("users")
+                .child(getCurrentUserId())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User me = dataSnapshot.getValue(User.class);
+
+                        OkHttpClient client = new OkHttpClient();
+
+                        String to = intent.getExtras().getString("to");
+                        String withId = intent.getExtras().getString("withId");
+                        String format = String
+                                .format("%s/sendNotification?to=%s&fromPushId=%s&fromId=%s&fromName=%s&type=%s",
+                                        FIREBASE_CLOUD_FUNCTIONS_BASE,
+                                        to,
+                                        me.getPushId(),
+                                        getCurrentUserId(),
+                                        me.getUsername(),
+                                        intent.getAction());
+
+                        Request request = new Request.Builder()
+                                .url(format)
+                                .build();
+
+                        client.newCall(request).enqueue(new Callback() {
+                            @Override
+                            public void onFailure(Call call, IOException e) {
+
+                            }
+
+                            @Override
+                            public void onResponse(Call call, Response response) throws IOException {
+
+                            }
+                        });
+
+                        if (intent.getAction().equals("accept")) {
+                            String gameId = withId + "-" + getCurrentUserId();
+                            FirebaseDatabase.getInstance().getReference().child("games")
+                                    .child(gameId)
+                                    .setValue(null);
+                            Intent In = new Intent(context, GameActivity.class);
+                            In.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(In
+                                    .putExtra("type", "wifi")
+                                    .putExtra("me", Integer.toString(COMPUTER))
+                                    .putExtra("gameId", gameId)
+                                    .putExtra("with", withId));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+    }
+}
