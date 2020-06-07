@@ -140,7 +140,6 @@ public class GameActivity extends AppCompatActivity {
                 //animation to button added 30 may
                 Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
                 btnExit.startAnimation(bounce_anim);
-                Log.e("Exit button", "Someone pressed the exit button");
                 if(isWifi) {
                     SetDBNull();
                 }
