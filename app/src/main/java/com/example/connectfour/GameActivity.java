@@ -61,14 +61,18 @@ public class GameActivity extends AppCompatActivity {
     static int lost;
     static int won;
     private static String status="";
+    private static int gamelevel;
     Button btnExit;
 	
 	boolean isWifi;
     private String gameId;
+	private TextView userOne;
+    private TextView userAnother;						 							 
     static int multiplayer;
     ChildEventListener childEventListener;
     ChildEventListener listener;
     DatabaseReference GameDB;
+    private static boolean isLeft;
     //Dialog to show winner or looser popup
     Dialog winner;
 
@@ -77,12 +81,31 @@ public class GameActivity extends AppCompatActivity {
     Button btnUserProfile;
 	
     /*database update objects end*/
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        if(isWifi) {
+            GameDB.removeEventListener(childEventListener);
+            GameDB.removeEventListener(listener);
+            SetDBNull();
+        }
+        finish();
+        Intent intent = new Intent(GameActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //full screen view added 30may
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game);
+
+        //added for getting value for difficulty level
+        Intent intent = getIntent();
+        gamelevel =intent.getIntExtra("level",4);
+
         mAuth = FirebaseAuth.getInstance();
         fstore=FirebaseFirestore.getInstance();
         btnExit=findViewById(R.id.btnExit);
@@ -93,10 +116,12 @@ public class GameActivity extends AppCompatActivity {
 					
 
         Bundle extras = getIntent().getExtras();
-        Log.e("Extras--->", String.valueOf(extras));
         String type = extras.getString("type");
         if (type.equals("wifi")) {
             isWifi = true;
+            isLeft = false;
+			userOne = findViewById(R.id.txtYou);
+            userAnother = findViewById(R.id.txtAnother);
             String gameId = extras.getString("gameId");
             setGameId(gameId);
             setMe(extras.getString("me"));
@@ -115,9 +140,9 @@ public class GameActivity extends AppCompatActivity {
                 //animation to button added 30 may
                 Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
                 btnExit.startAnimation(bounce_anim);
+                Log.e("Exit button", "Someone pressed the exit button");
                 if(isWifi) {
-                    GameDB.removeEventListener(childEventListener);
-                    GameDB.removeEventListener(listener);
+                    SetDBNull();
                 }
                 startActivity(new Intent(GameActivity.this, MainActivity.class));
             }
@@ -125,8 +150,32 @@ public class GameActivity extends AppCompatActivity {
 
         setUpBoard();
     }
-
-
+    private void SetDBNull() {
+        isLeft = true;
+        FirebaseDatabase.getInstance().getReference().child("games")
+                .child(gameId)
+                .setValue(null);
+        FirebaseDatabase.getInstance().getReference().child("games")
+                .child(gameId)
+                .child("Exit")
+                .setValue(multiplayer);
+    }
+	private void ChangeDBActivity(String activity) {
+        FirebaseDatabase.getInstance().getReference().child("games")
+                .child(gameId)
+                .child(activity)
+                .setValue(multiplayer);
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (isFinishing()) {
+            if(isWifi) {
+                GameDB.removeEventListener(childEventListener);
+                GameDB.removeEventListener(listener);
+            }
+        }
+    }
     private void getScores()
     {
         String uid = mAuth.getCurrentUser().getUid();
@@ -277,30 +326,26 @@ public class GameActivity extends AppCompatActivity {
     public void setGameId(String gameId) {
         this.gameId = gameId;
         GameDB = FirebaseDatabase.getInstance().getReference().child("games").child(gameId);
-        Log.e("MultiPlayAgain----->", String.valueOf(listener));
-        Log.e("MultiPlayAgain----->", String.valueOf(childEventListener));
-        // Add a new propery for the listener
-//        if (GameDB != null && childEventListener != null) {
-//            listener.removeChildEventListener(childEventListener);
-//        }
         childEventListener = new ChildEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot.getValue() == null) {
                     return;
                 }
                 String key = dataSnapshot.getKey();
-                if (!key.equals("restart")) {
+                if(!key.equals("restart")) {
                     int row = Integer.parseInt(key.substring(0, 1));
                     int col = Integer.parseInt(key.substring(2, 3));
                     Integer shape = dataSnapshot.getValue(Integer.class);
-                    Log.e("Row this---->", "here");
                     play(shape, row, col, GameActivity.this.gameBoard);
 
                     if (announceWinner(row, col)) return;
                     //player's turn, the listener will now play in the place he chooses
                     playerTurn = !playerTurn;
                 } else {
+                    GameDB.removeEventListener(childEventListener);
+                    GameDB.removeEventListener(listener);
                     playAgain();
                 }
             }
@@ -317,11 +362,13 @@ public class GameActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
+
                 GameDB.removeEventListener(childEventListener);
                 GameDB.removeEventListener(listener);
-                playAgain();
-
-
+                if(!isLeft) {
+                    Toast.makeText(getApplicationContext(), "Oops! Your friend left the room!", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(GameActivity.this, MainActivity.class));
+                }
             }
 
 
@@ -343,10 +390,14 @@ public class GameActivity extends AppCompatActivity {
             playerTurn = true;
             Toast.makeText(this, "Your turn", Toast.LENGTH_SHORT).show();
             multiplayer = 1;
+			userOne.setText("You");
+            userAnother.setText("Friend");	   
         } else {
             playerTurn = false;
             Toast.makeText(this, "Opponent's turn", Toast.LENGTH_SHORT).show();
             multiplayer = 2;
+			userOne.setText("Friend");
+            userAnother.setText("You");
         }
     }
     private int getWinner(int row, int col) {
@@ -544,14 +595,7 @@ public class GameActivity extends AppCompatActivity {
             if (!isWifi) {
                 playAgain();
             } else {
-                FirebaseDatabase.getInstance().getReference().child("games")
-                        .child(gameId)
-                        .setValue(null);
-
-                FirebaseDatabase.getInstance().getReference().child("games")
-                        .child(gameId)
-                        .child("restart")
-                        .setValue(System.currentTimeMillis());
+                ChangeDBActivity("restart");
             }
         });
 
@@ -564,8 +608,7 @@ public class GameActivity extends AppCompatActivity {
                 Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
                 btnUserProfile.startAnimation(bounce_anim);
                 if(isWifi) {
-                    GameDB.removeEventListener(childEventListener);
-                    GameDB.removeEventListener(listener);
+                    SetDBNull();
                 }
                 startActivity(new Intent(GameActivity.this, userHomeActivity.class));
             }
@@ -590,16 +633,17 @@ public class GameActivity extends AppCompatActivity {
                             {
                                 //Toast.makeText(getApplicationContext(), "Lost count updated", Toast.LENGTH_SHORT).show();
                                 Log.d("GameActivity: ","Lost count updated");
-                                lost=lost1;
+                                //lost=lost1;
                             }
                             else
                             {
                                 //Toast.makeText(getApplicationContext(), "Lost count not updated", Toast.LENGTH_SHORT).show();
                                 Log.d("GameActivity: ","Lost count NOT updated");
-                                lost=lost1;
+                                //lost=lost1;
                             }
                         }
                     });
+            lost=lost1;
         }
         if(status.equals("won"))
         {
@@ -611,17 +655,49 @@ public class GameActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 //Toast.makeText(getApplicationContext(), "Win count updated", Toast.LENGTH_SHORT).show();
                                 Log.d("GameActivity: ","Win count updated");
-                                won = won1;
+                                //won = won1;
                             }
                             else
                             {
                                 //Toast.makeText(getApplicationContext(), "Win count not updated", Toast.LENGTH_SHORT).show();
                                 Log.d("GameActivity: ","Win count NOT updated");
-                                won = won1;
+                                //won = won1;
                             }
                         }
                     });
+            won = won1;
         }
+
+        float rank_to_update=0;
+        if(won>0){
+        float fl_lost=lost;
+        float fl_won=won;
+        rank_to_update=fl_won/(fl_lost+fl_won);
+        rank_to_update=rank_to_update*100.0f;}
+        documentReference.update("ranking",String.valueOf(rank_to_update))
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            //Toast.makeText(getApplicationContext(), "Ranking updated", Toast.LENGTH_SHORT).show();
+                            Log.d("GameActivity: ","Ranking of player updated");
+
+                        }
+                        else
+                        {
+                            //Toast.makeText(getApplicationContext(), "Ranking not updated", Toast.LENGTH_SHORT).show();
+                            Log.d("GameActivity: ","Ranking of player NOT updated");
+
+                        }
+                    }
+                });
+
+
+
+    }
+
+    public void update_rank(int won,int lost)
+    {
 
     }
 
@@ -666,8 +742,12 @@ public class GameActivity extends AppCompatActivity {
                 new ComputerTurn().execute();
             } else {
                 // This else is for multiplayer users. This will first save entry to firebase db and do further calculation in setGameId function
-                if (getFirstAvailableRow(colNumber) == -1 || !GameActivity.playerTurn) {
-                    Toast.makeText(getApplicationContext(), "Cannot play in this column or Not your turn", Toast.LENGTH_SHORT).show();
+                if (!GameActivity.playerTurn) {
+                    Toast.makeText(getApplicationContext(), "Opponent's turn", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (getFirstAvailableRow(colNumber) == -1) {
+                    Toast.makeText(getApplicationContext(), "Cannot play in this column", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 FirebaseDatabase.getInstance().getReference().child("games")
@@ -792,7 +872,8 @@ private class ComputerTurn extends AsyncTask<Void,Void,Integer>{
     @Override
         protected Integer doInBackground(Void... params) {
 
-                maxDepth = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getInt(Constants.DIFFICULTY,Constants.MODE_MEDIUM);
+                //maxDepth = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getInt(Constants.DIFFICULTY,Constants.MODE_MEDIUM);
+                maxDepth = gamelevel;
                 return minimax();
         }
 
@@ -809,9 +890,4 @@ private class ComputerTurn extends AsyncTask<Void,Void,Integer>{
         GameActivity.playerTurn = true;
     }
 }
-
 }
-
-
-
-
