@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Random;
 
 import static com.example.connectfour.Constants.COMPUTER;
+import static com.example.connectfour.Constants.MODE_EASY;
 import static com.example.connectfour.Constants.PLAYER;
 import static java.lang.Thread.sleep;
 
@@ -388,14 +389,14 @@ public class GameActivity extends AppCompatActivity {
             playerTurn = true;
             Toast.makeText(this, "Your turn", Toast.LENGTH_SHORT).show();
             multiplayer = 1;
-			userOne.setText("You");
-            userAnother.setText("Friend");	   
+			userOne.setText("YOU");
+            userAnother.setText("  FRIEND");
         } else {
             playerTurn = false;
             Toast.makeText(this, "Opponent's turn", Toast.LENGTH_SHORT).show();
             multiplayer = 2;
-			userOne.setText("Friend");
-            userAnother.setText("You");
+			userOne.setText("FRIEND");
+            userAnother.setText(" YOU");
         }
     }
     private int getWinner(int row, int col) {
@@ -823,7 +824,7 @@ private class ComputerTurn extends AsyncTask<Void,Void,Integer>{
 
             }
 
-            if(maxDepth > 4){   //to adjust difficulty
+            if(maxDepth > MODE_EASY){   //to adjust difficulty
                 if(c == cmax){  //if any play from here leads to winning, give greater maximum value (force playing here)
                     max = 200;
                 }

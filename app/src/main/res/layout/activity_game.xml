@@ -44,7 +44,7 @@
             android:id="@+id/imgComputer"
             android:layout_width="65dp"
             android:layout_height="65dp"
-            android:layout_marginLeft="181dp"
+            android:layout_marginLeft="205dp"
             android:layout_marginTop="45dp"
             android:layout_toRightOf="@+id/imgYou"
             android:src="@drawable/computer_circle">
@@ -56,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/imgComputer"
-            android:layout_marginLeft="178dp"
+            android:layout_marginLeft="200dp"
             android:layout_marginTop="40dp"
             android:layout_toRightOf="@+id/txtYou"
             android:text="COMPUTER"
