@@ -12,10 +12,13 @@ Functionalities:
 
 ## GamePlay
 
-*Single-Player*
+### 1. Single-Player
+
 <img src="https://user-images.githubusercontent.com/58618433/92290723-fc7b5600-eec9-11ea-9a96-97e4542f69f7.gif" width="300px" />
 
-*Multi-Player*
+### 2. Multi-Player
+
+<img src="https://user-images.githubusercontent.com/58618433/92290723-fc7b5600-eec9-11ea-9a96-97e4542f69f7.gif" width="300px" />
 
 ### Splash Screen
 Splash screen is a simple screen that shows the app logo and name to the user, the screen visible on each startup of the app for a two second.
