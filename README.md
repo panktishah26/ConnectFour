@@ -13,7 +13,7 @@ Functionalities:
 ## GamePlay
 
 *Single-Player*
-
+<img src="https://user-images.githubusercontent.com/58618433/92290723-fc7b5600-eec9-11ea-9a96-97e4542f69f7.gif" width="300px" />
 
 *Multi-Player*
 
