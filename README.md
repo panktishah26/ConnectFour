@@ -3,9 +3,9 @@
 ConnectFour lets 2 players participate in the game. The opponent can be a friend or the Computer. The goal of this game is to be the first to connect 4 pieces in a line (horizontal, vertical or diagonal).
 
 ##Functionalities:
-### 1. Splash Screen, Registration, Login image
+### 1. Splash Screen, Registration, Login page
 
-<img src="https://user-images.githubusercontent.com/58618433/92290948-0ea9c400-eecb-11ea-9432-5609b656176c.jpg" width="200px" /> <img src="https://user-images.githubusercontent.com/58618433/92290967-1cf7e000-eecb-11ea-98be-f9c128aafadb.jpg" width="200px" /> <img src="https://user-images.githubusercontent.com/58618433/92290962-1bc6b300-eecb-11ea-8a02-d7fb70bbe842.jpg" width="200px" /> <img src="https://user-images.githubusercontent.com/58618433/92290965-1c5f4980-eecb-11ea-8369-c7f03bf05628.jpg" width="200px" />
+<img src="https://user-images.githubusercontent.com/58618433/92290948-0ea9c400-eecb-11ea-9432-5609b656176c.jpg" width="200px" height="1000px" /> <img src="https://user-images.githubusercontent.com/58618433/92290967-1cf7e000-eecb-11ea-98be-f9c128aafadb.jpg" width="200px" height="1000px" /> <img src="https://user-images.githubusercontent.com/58618433/92290962-1bc6b300-eecb-11ea-8a02-d7fb70bbe842.jpg" width="200px" height="1000px" /> <img src="https://user-images.githubusercontent.com/58618433/92290965-1c5f4980-eecb-11ea-8369-c7f03bf05628.jpg" width="200px" height="1000px" />
   
 ### 2. Play with a Computer (Random move), Choose difficulty level to play with Computer
 
