@@ -13,11 +13,11 @@ ConnectFour lets 2 players participate in the game. The opponent can be a friend
 
 ### 3. Sending an invite to a friend (push notification), Play with a friend
 
-<img src="https://user-images.githubusercontent.com/58618433/92290960-1b2e1c80-eecb-11ea-8291-88f7172a65cb.jpg" width="225px" height="450px" /> <img src="https://user-images.githubusercontent.com/58618433/92291166-2c2b5d80-eecc-11ea-832e-5e7acfc519eb.jpg" width="200px" height="400px" /> <img src="https://user-images.githubusercontent.com/58618433/92291845-53cff500-eecf-11ea-9eaf-0e9c5d2b0de8.jpg" width="200px" height="400px" />
+<img src="https://user-images.githubusercontent.com/58618433/92290960-1b2e1c80-eecb-11ea-8291-88f7172a65cb.jpg" width="200px" height="400px" /> <img src="https://user-images.githubusercontent.com/58618433/92291166-2c2b5d80-eecc-11ea-832e-5e7acfc519eb.jpg" width="200px" height="400px" /> <img src="https://user-images.githubusercontent.com/58618433/92291845-53cff500-eecf-11ea-9eaf-0e9c5d2b0de8.jpg" width="200px" height="400px" />
 
 ### 4. Global Ranking Feature
 
-<img src="https://user-images.githubusercontent.com/58618433/92290961-1b2e1c80-eecb-11ea-971d-daa5a14ccbec.jpg" width="225px" height="400px" /> <img src="https://user-images.githubusercontent.com/58618433/92291841-503c6e00-eecf-11ea-892f-a05afa6e4ffb.jpg" width="200px" height="400px" />
+<img src="https://user-images.githubusercontent.com/58618433/92290961-1b2e1c80-eecb-11ea-971d-daa5a14ccbec.jpg" width="200px" height="400px" /> <img src="https://user-images.githubusercontent.com/58618433/92291841-503c6e00-eecf-11ea-892f-a05afa6e4ffb.jpg" width="200px" height="400px" />
 
 ## GamePlay
 
