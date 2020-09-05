@@ -5,7 +5,7 @@ ConnectFour lets 2 players participate in the game. The opponent can be a friend
 ## Features:
 ### 1. Splash Screen, Registration, Login page
 
-<img src="https://user-images.githubusercontent.com/58618433/92290948-0ea9c400-eecb-11ea-9432-5609b656176c.jpg" width="225px" height="450px" /> <img src="https://user-images.githubusercontent.com/58618433/92290967-1cf7e000-eecb-11ea-98be-f9c128aafadb.jpg" width="225px" height="450px" /> <img src="https://user-images.githubusercontent.com/58618433/92290962-1bc6b300-eecb-11ea-8a02-d7fb70bbe842.jpg" width="225px" height="450px" /> <img src="https://user-images.githubusercontent.com/58618433/92290965-1c5f4980-eecb-11ea-8369-c7f03bf05628.jpg" width="225px" height="450px" />
+<img src="https://user-images.githubusercontent.com/58618433/92290948-0ea9c400-eecb-11ea-9432-5609b656176c.jpg" width="125px" height="350px" /> <img src="https://user-images.githubusercontent.com/58618433/92290967-1cf7e000-eecb-11ea-98be-f9c128aafadb.jpg" width="225px" height="450px" /> <img src="https://user-images.githubusercontent.com/58618433/92290962-1bc6b300-eecb-11ea-8a02-d7fb70bbe842.jpg" width="225px" height="450px" /> <img src="https://user-images.githubusercontent.com/58618433/92290965-1c5f4980-eecb-11ea-8369-c7f03bf05628.jpg" width="225px" height="450px" />
   
 ### 2. Play with a Computer (Random move), Choose difficulty level to play with Computer
 
@@ -21,9 +21,14 @@ ConnectFour lets 2 players participate in the game. The opponent can be a friend
 
 ## GamePlay
 
-### 1. Single-Player                                  2. Multi-Player
+### 1. Single-Player
 
-<img src="https://user-images.githubusercontent.com/58618433/92290723-fc7b5600-eec9-11ea-9a96-97e4542f69f7.gif" width="300px" /> <img src="https://user-images.githubusercontent.com/58618433/92290723-fc7b5600-eec9-11ea-9a96-97e4542f69f7.gif" width="300px" />
+<img src="https://user-images.githubusercontent.com/58618433/92290723-fc7b5600-eec9-11ea-9a96-97e4542f69f7.gif" width="300px" /> 
+
+### 2. Multi-Player
+(Sorry for bad quality!)
+
+<img src="https://user-images.githubusercontent.com/58618433/92292467-3f412c00-eed2-11ea-8e9c-398578cd8911.gif" width="300px" />
 
 
 ## TO DO
