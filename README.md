@@ -28,7 +28,7 @@ ConnectFour lets 2 players participate in the game. The opponent can be a friend
 ### 2. Multi-Player
 (Sorry for bad quality!)
 
-<img src="https://user-images.githubusercontent.com/58618433/92292467-3f412c00-eed2-11ea-8e9c-398578cd8911.gif" width="275px" />
+<img src="https://user-images.githubusercontent.com/58618433/92292467-3f412c00-eed2-11ea-8e9c-398578cd8911.gif" />
 
 
 ## TO DO
