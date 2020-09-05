@@ -9,7 +9,7 @@ ConnectFour lets 2 players participate in the game. The opponent can be a friend
   
 ### 2. Play with a Computer (Random move), Choose difficulty level to play with Computer
 
-<img src="https://user-images.githubusercontent.com/58618433/92290971-1e290d00-eecb-11ea-99f1-82117d5b354e.jpg" width="225px" height="450px" /> <img src="https://user-images.githubusercontent.com/58618433/92291165-2b92c700-eecc-11ea-852a-6e86ac652acf.jpg" width="200px" height="400px" /> <img src="https://user-images.githubusercontent.com/58618433/92290970-1d907680-eecb-11ea-91b1-ac3b30311b92.jpg" width="200px" height="400px" /> <img src="https://user-images.githubusercontent.com/58618433/92290963-1c5f4980-eecb-11ea-85c2-8c36086d1f52.jpg" width="200px" height="400px" />
+<img src="https://user-images.githubusercontent.com/58618433/92290971-1e290d00-eecb-11ea-99f1-82117d5b354e.jpg" width="200px" height="400px" /> <img src="https://user-images.githubusercontent.com/58618433/92291165-2b92c700-eecc-11ea-852a-6e86ac652acf.jpg" width="200px" height="400px" /> <img src="https://user-images.githubusercontent.com/58618433/92290970-1d907680-eecb-11ea-91b1-ac3b30311b92.jpg" width="200px" height="400px" /> <img src="https://user-images.githubusercontent.com/58618433/92290963-1c5f4980-eecb-11ea-85c2-8c36086d1f52.jpg" width="200px" height="400px" />
 
 ### 3. Sending an invite to a friend (push notification), Play with a friend
 
